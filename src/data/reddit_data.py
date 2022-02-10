@@ -13,7 +13,6 @@ from dotenv import find_dotenv, load_dotenv
 logger = logging.getLogger("Reddit")
 project_dir = "./"
 
-
 subs_of_interest = ["CryptoCurrency"]
 
 def authenticate_reddit():
@@ -80,6 +79,8 @@ def pull_subreddit(subreddit_name, authentication, days_ago = 1):
     params = {'limit': 100}
     subreddit_data = pd.DataFrame()
     
+    logger.info("MAKING REQUESTS TO: {}".format("https://oauth.reddit.com/r/{}/new".format(subreddit_name)))
+
     try:
         for i in range(10):
             res = requests.get("https://oauth.reddit.com/r/{}/new".format(subreddit_name),
@@ -106,14 +107,13 @@ def pull_subreddit(subreddit_name, authentication, days_ago = 1):
                 raise Exception("Failure pulling data")
             
             # Wait 2 seconds before next call to reddit API
-            time.sleep(1)
+            time.sleep(3)
 
     except Exception as e:
         logger.error(e)
 
     return subreddit_data
     
-
 def reddit():
     """ 
         Steps to pull data from reddit
@@ -127,9 +127,9 @@ def reddit():
         return 400
 
     # Create the header to be used in future get requests
-    authentication_header = {'User-Agent': 'SYSC_4906/0.0.1', 'Authorization' : 'bearer {}'.format(access_token)}
+    authentication_header = {'User-Agent': 'SYSC_4906/1.0.0', 'Authorization' : 'bearer {}'.format(access_token)}
    
-    subreddits_to_explore = json.load(open("{}/src/data/reddit_config.json".format(project_dir)))
+    subreddits_to_explore = json.load(open("{}/src/data/config/reddit_config.json".format(project_dir)))
 
     for this_subreddit in subreddits_to_explore["subreddits"]:
         try:
@@ -148,14 +148,16 @@ def reddit():
     return 200
     
 
-
 if __name__ == '__main__':
     try:
+        project_dir = Path(__file__).resolve().parents[2]
+
         log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         logging.basicConfig(level=logging.INFO, format=log_fmt,
-                            filemode='w', filename="reddit_data_logs.log")
-
-        project_dir = Path(__file__).resolve().parents[2]
+                            handlers= [
+                                logging.FileHandler("{}/src/data/logs/reddit_data_logs.log".format(project_dir)),
+                                logging.StreamHandler()
+                            ])
 
         logger.info("Running in {}".format(project_dir))
 
