@@ -72,27 +72,22 @@ def restructure_subreddit_data(reddit_data):
 
     return subreddit_data_slice, after, last_post_time
 
-def pull_subreddit(subreddit_name, authentication, days_ago = 1):
+def make_reddit_request(url, params, authentication, subreddit_name, days_ago):
     """
-        pull all posts from a subbreddit between now and the specified amount of days prior to pull too
+        pull the specificied amount of data using the reddit API
     """
-    params = {'limit': 100}
-    subreddit_data = pd.DataFrame()
-    
-    logger.info("MAKING REQUESTS TO: {}".format("https://oauth.reddit.com/r/{}/new".format(subreddit_name)))
+    collected_data = pd.DataFrame()
 
     try:
-        for i in range(10):
-            res = requests.get("https://oauth.reddit.com/r/{}/new".format(subreddit_name),
-                            headers=authentication,
-                            params=params)
+        for i in range(1000):
+            res = requests.get(url=url, headers= authentication, params=params)
 
             if(res.status_code == 200):
                 logger.info("Success pulling data from {}".format(subreddit_name))
 
                 subreddit_slice, last_id, last_post = restructure_subreddit_data(res.json())
 
-                subreddit_data = subreddit_data.append(subreddit_slice, ignore_index=True)
+                collected_data = collected_data.append(subreddit_slice, ignore_index=True)
                 logger.info("Last data pull was from: {}".format(time.ctime(last_post)))
 
                 if((int(time.time()) - int(last_post)) >= days_ago*86400 ): # time difference is more than a certain span of seconds (86400 secs in a day)
@@ -105,12 +100,57 @@ def pull_subreddit(subreddit_name, authentication, days_ago = 1):
             else:
                 logger.error("Status code {} recieved".format(res.status_code))
                 raise Exception("Failure pulling data")
-            
-            # Wait 2 seconds before next call to reddit API
-            time.sleep(3)
 
+            # Wait 2 seconds before next call to reddit API
+            time.sleep(2)
     except Exception as e:
         logger.error(e)
+
+    return collected_data
+
+
+def pull_subreddit_keyword(subreddit_name, authentication, keywords, days_ago = 1):
+    """
+        Pull all posts with keywords from a subreddit between now and the specificed amount of days prior
+    """
+    keyword_query = str(" OR ").join(keywords)
+    
+    params = {
+        'limit': 100, 
+        'restrict_sr': True,
+        'q': keyword_query 
+    }
+
+    logger.info("searching using params: {}".format(params))
+    request_url = "https://oauth.reddit.com/r/{}/search".format(subreddit_name)
+    logger.info("MAKING REQUESTS TO: {}".format(request_url))
+    logger.info("Searching using the following keywords \n {}".format(keywords))
+
+    subreddit_data = make_reddit_request(url = request_url,
+        authentication = authentication,    
+        params = params,
+        subreddit_name = subreddit_name,
+        days_ago = days_ago
+        )
+    return subreddit_data
+
+
+def pull_subreddit_data(subreddit_name, authentication, days_ago = 1):
+    """
+        pull all posts from a subreddit between now and the specified amount of days prior
+    """
+    params = {'limit': 100}
+    subreddit_data = pd.DataFrame()
+    
+    request_url = "https://oauth.reddit.com/r/{}/new".format(subreddit_name)
+    logger.info("MAKING REQUESTS TO: {}".format(request_url))
+
+    subreddit_data = make_reddit_request(url = request_url, 
+        authentication=authentication,
+        params = params,  
+        subreddit_name=subreddit_name,
+        days_ago=days_ago
+        )
 
     return subreddit_data
     
@@ -135,7 +175,39 @@ def reddit():
         try:
             logger.info("Attempting to fetch data from r/{}".format(this_subreddit["sub_name"]))
 
-            subreddit_pull = pull_subreddit(this_subreddit["sub_name"], authentication_header, 1)
+            # Using the reddit_config file determine how many days we want to pull from this sub
+            try: 
+                days_to_pull = this_subreddit["days"]
+            except Exception as e: 
+                days_to_pull = subreddits_to_explore["default_days"]
+
+            # Then we determine what kind of pull we are doing!
+            try:
+                # First check if we want to search using the default keywords
+                keywords_to_search = subreddits_to_explore["default_keywords"] if (this_subreddit["keywords"]["use_defaults"]) else []
+                keywords_to_search += this_subreddit["keywords"]["extras"] if(len(this_subreddit["keywords"]["extras"]) > 0) else []
+
+                if(len(keywords_to_search) < 1):
+                    raise ValueError("No keywords are listed")
+
+                logger.info("Performing a keyword pull")
+                # Now that we have the list of keywords to use, we call the keyword pull function
+                subreddit_pull = pull_subreddit_keyword(this_subreddit["sub_name"], 
+                    authentication_header, 
+                    keywords_to_search, 
+                    days_to_pull
+                    )
+
+            except KeyError as e:
+                logger.info("Performing a Subreddit pull")
+                # If no keyword data exists then we pull all data from the subreddit up to x days in the past
+                subreddit_pull = pull_subreddit_data(this_subreddit["sub_name"], 
+                    authentication_header, 
+                    days_to_pull)
+
+            except Exception as e:
+                logger.info("An Error Occured: {}".format(e))
+
 
             logger.info("Saving r/{} data to: {}/data/raw/reddit/r_{}.json".format(this_subreddit["sub_name"], project_dir, this_subreddit["sub_name"]))
 
@@ -155,7 +227,7 @@ if __name__ == '__main__':
         log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         logging.basicConfig(level=logging.INFO, format=log_fmt,
                             handlers= [
-                                logging.FileHandler("{}/src/data/logs/reddit_data_logs.log".format(project_dir)),
+                                logging.FileHandler("{}/src/data/logs/reddit_data_logs.log".format(project_dir), mode = "w"),
                                 logging.StreamHandler()
                             ])
 

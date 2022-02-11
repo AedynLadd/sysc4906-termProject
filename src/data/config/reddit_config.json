@@ -1,16 +1,13 @@
 {
+    "default_days": 1,
+    "default_keywords": ["bitcoin", "testing"],
     "subreddits": [
         {
-            "sub_name": "CryptoCurrency"
-        },
-        {
-            "sub_name": "btc"
-        },
-        {
-            "sub_name": "bitcoin"
-        },
-        {
-            "sub_name": "CryptoMarkets"
+            "sub_name": "CryptoCurrency",
+            "keywords": {
+                "use_defaults": true,
+                "extras": ["crypto"]
+            }
         }
     ]
 }
