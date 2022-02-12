@@ -104,7 +104,10 @@ def make_reddit_request(url, params, authentication, subreddit_name, days_ago):
             # Wait 2 seconds before next call to reddit API
             time.sleep(2)
     except Exception as e:
-        logger.error(e)
+        if(e.args[0] == "Done"):
+            logger.info("PULL OF DATA FROM r/{} IS DONE".format(subreddit_name))
+        else:
+            logger.error(e)
 
     return collected_data
 
@@ -114,7 +117,7 @@ def pull_subreddit_keyword(subreddit_name, authentication, keywords, days_ago = 
         Pull all posts with keywords from a subreddit between now and the specificed amount of days prior
     """
     keyword_query = str(" OR ").join(keywords)
-    
+
     params = {
         'limit': 100, 
         'restrict_sr': True,
@@ -239,6 +242,7 @@ if __name__ == '__main__':
         status = reddit()
 
         logger.info(status)
+
     except Exception as e:
         logger.error(e)
 
