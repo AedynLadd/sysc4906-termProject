@@ -1,5 +1,5 @@
 {
-    "default_days": 1,
+    "default_days": 10,
     "default_keywords": ["bitcoin", "testing"],
     "subreddits": [
         {
@@ -8,6 +8,39 @@
                 "use_defaults": true,
                 "extras": ["crypto"]
             }
+        }, 
+        {   
+            "sub_name": "bitcoin"
+        },
+        {   
+            "sub_name": "btc"
+        },
+        {   
+            "sub_name": "CryptoMarkets"
+        },
+        {   
+            "sub_name": "bitcoinbeginners"
+        },
+        {   
+            "sub_name": "cryptoCurrencies"
+        },
+        {
+            "sub_name": "altcoin"
+        },
+        {   
+            "sub_name": "icocrypto"
+        },
+        {   
+            "sub_name": "CryptoCurrencyTrading"
+        },
+        {
+            "sub_name": "ethereum"
+        },
+        {
+            "sub_name": "binance"
+        },
+        {   
+            "sub_name": "CoinBase"
         }
     ]
 }

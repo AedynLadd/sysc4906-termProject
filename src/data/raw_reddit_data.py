@@ -13,8 +13,6 @@ from dotenv import find_dotenv, load_dotenv
 logger = logging.getLogger("Reddit")
 project_dir = "./"
 
-subs_of_interest = ["CryptoCurrency"]
-
 def authenticate_reddit():
     """
         Authenticate Script to be able to access the reddit API
@@ -121,7 +119,7 @@ def pull_subreddit_keyword(subreddit_name, authentication, keywords, days_ago = 
     params = {
         'limit': 100, 
         'restrict_sr': True,
-        'q': keyword_query 
+        'q': keyword_query[:512]
     }
 
     logger.info("searching using params: {}".format(params))
