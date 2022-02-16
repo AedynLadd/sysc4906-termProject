@@ -14,12 +14,6 @@ project_dir = "./"
 
 text_process_config = json.load(open("{}/src/data/config/text_process_config.json".format(project_dir)))
 
-def files_to_analyze(project_path):
-    """
-        Identify files we need to use
-    """
-    return [filename for filename in Path(project_path).glob('*')]
-
 def tokenize(input_text):
     """
         We begin with tokenization - we split our text into just words
@@ -52,6 +46,7 @@ def process_data(filename):
     """
         Process the data
     """
+    logger.info("Processing data in: {}".format(str(filename)))
     processed_data = pd.DataFrame()
 
     try:
@@ -83,6 +78,7 @@ if __name__ == '__main__':
         logger.info("Running in {}".format(project_dir))
 
         for data_source_name in text_process_config["data_stores"]:
+            logger.info("Running through {} data".format(data_source_name))
             try:
                 data_source_path = "{}/data/raw/{}".format(project_dir, data_source_name)
                 
