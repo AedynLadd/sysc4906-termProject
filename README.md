@@ -1,7 +1,10 @@
 # sysc4906-termProject
  
-## Project Proposal Doc
+## Project Proposal
 https://www.overleaf.com/8239623562pxkkmdjdtbsg
+
+## Progress Report
+https://www.overleaf.com/1613467463dczmnhxynwsj
 
 ## Folder Structure
 ├── LICENSE <br/>
