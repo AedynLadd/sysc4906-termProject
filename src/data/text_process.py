@@ -10,6 +10,8 @@ project_dir = "./"
 
 text_process_config = json.load(open("{}/src/data/config/text_process_config.json".format(project_dir)))
 
+bag_of_words = {"num_words": 0, "word_to_int": {}, "int_to_word": {}}
+
 def tokenize(input_text):
     """
         We begin with tokenization - we split our text into just words
@@ -24,19 +26,39 @@ def tokenize(input_text):
 
     return input_text.lower()
 
+def define_factor(word):
+    try:
+        return bag_of_words["word_to_int"][word]
+    except Exception as e:
+        # If the index doesn't exist
+        integer_rep = bag_of_words["num_words"]
+        bag_of_words["num_words"] += 1 # increase for next word
+        bag_of_words["word_to_int"][word] = integer_rep
+        bag_of_words["int_to_word"]["{}".format(integer_rep)] = word
+        return integer_rep
+
 def filter_raw(loaded_raw):
     """
-        defines all necessary steps to filter our raw data
+        defines all necessary steps to filter our raw data including adding to our bag of words
     """
     tokenized_text = ""
 
     try:
-        tokenized_text = [token for token in tokenize(loaded_raw).split(" ") if len(token) > 1]
-        tokenized_text = " ".join(tokenized_text)
+        tokenized_text = [define_factor(token) for token in tokenize(loaded_raw).split(" ") if len(token) > 1]
+        # tokenized_text = " ".join(tokenized_text)
     except Exception as e:
         logger.error("An Error Occured Tokenizing : {}".format(e))
     finally:
         return tokenized_text
+
+def validate_key(data, key):
+    """
+        Validates that a key exists or not
+    """
+    try:
+        return data[key[0]]
+    except Exception as e:
+        return "NAN"
 
 def process_data(filename):
     """
@@ -51,9 +73,10 @@ def process_data(filename):
         # Our next step is to filter our raw data - This will include both the selftext and the title
         loaded_raw["combined_text_data"] = loaded_raw["title"] + loaded_raw["selftext"]
         # Apply our text filter to this new column
-        processed_data["timestamp"] = loaded_raw["created_utc"]
-        processed_data["data"] = loaded_raw["combined_text_data"].apply(filter_raw)
-        processed_data["score"] = loaded_raw["score"]
+        processed_data["source"] = validate_key(loaded_raw, ["subreddit"])
+        processed_data["timestamp"] = validate_key(loaded_raw, ["created_utc"])
+        processed_data["data"] = validate_key(loaded_raw, ["combined_text_data"]).apply(filter_raw)
+        processed_data["score"] = validate_key(loaded_raw, ["score"])
 
     except Exception as e:
         logger.info("An Error Occured when processing at the filepath {}: {}".format(filename, e))
@@ -86,6 +109,9 @@ if __name__ == '__main__':
             except Exception as e:
                 logger.error("Error Occured when processing {} data: {}".format(data_source_name, e))
         
+        with open('{}/data/interim/bag_of_words.json'.format(project_dir), 'w') as openfile:
+            json.dump(bag_of_words, openfile)
+
         logger.info("Text Analysis Completed")
     except Exception as e:
         logger.error(e)

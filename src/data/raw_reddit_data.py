@@ -52,9 +52,9 @@ def restructure_subreddit_data(reddit_data):
     for post in reddit_data['data']['children']:
         # identify time
         last_post_time = post['data']['created_utc'] 
-
         subreddit_data_slice = subreddit_data_slice.append({
             'title': post['data']['title'],
+            'subreddit': post['data']['subreddit'],
             'selftext': post['data']['selftext'],
             'upvote_ratio': post['data']['upvote_ratio'],
             'ups': post['data']['ups'],
@@ -100,7 +100,7 @@ def make_reddit_request(url, params, authentication, subreddit_name, days_ago):
                 raise Exception("Failure pulling data")
 
             # Wait 2 seconds before next call to reddit API
-            time.sleep(2)
+            time.sleep(1)
     except Exception as e:
         if(e.args[0] == "Done"):
             logger.info("PULL OF DATA FROM r/{} IS DONE".format(subreddit_name))
