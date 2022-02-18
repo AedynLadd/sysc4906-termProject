@@ -10,8 +10,6 @@ project_dir = "./"
 
 text_process_config = json.load(open("{}/src/data/config/text_process_config.json".format(project_dir)))
 
-bag_of_words = {"num_words": 0, "word_to_int": {}, "int_to_word": {}}
-
 def tokenize(input_text):
     """
         We begin with tokenization - we split our text into just words
@@ -26,16 +24,6 @@ def tokenize(input_text):
 
     return input_text.lower()
 
-def define_factor(word):
-    try:
-        return bag_of_words["word_to_int"][word]
-    except Exception as e:
-        # If the index doesn't exist
-        integer_rep = bag_of_words["num_words"]
-        bag_of_words["num_words"] += 1 # increase for next word
-        bag_of_words["word_to_int"][word] = integer_rep
-        bag_of_words["int_to_word"]["{}".format(integer_rep)] = word
-        return integer_rep
 
 def filter_raw(loaded_raw):
     """
@@ -44,8 +32,8 @@ def filter_raw(loaded_raw):
     tokenized_text = ""
 
     try:
-        tokenized_text = [define_factor(token) for token in tokenize(loaded_raw).split(" ") if len(token) > 1]
-        # tokenized_text = " ".join(tokenized_text)
+        tokenized_text = [token for token in tokenize(loaded_raw).split(" ") if len(token) > 1]
+        tokenized_text = " ".join(tokenized_text)
     except Exception as e:
         logger.error("An Error Occured Tokenizing : {}".format(e))
     finally:
@@ -90,7 +78,7 @@ if __name__ == '__main__':
         log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         logging.basicConfig(level=logging.INFO, format=log_fmt,
                             handlers= [
-                                logging.FileHandler("{}/src/data/logs/text_process.log".format(project_dir), mode = "w"),
+                                logging.FileHandler("{}/logs/text_process.log".format(project_dir), mode = "w"),
                                 logging.StreamHandler()
                             ])
 
@@ -108,9 +96,6 @@ if __name__ == '__main__':
 
             except Exception as e:
                 logger.error("Error Occured when processing {} data: {}".format(data_source_name, e))
-        
-        with open('{}/data/interim/bag_of_words.json'.format(project_dir), 'w') as openfile:
-            json.dump(bag_of_words, openfile)
 
         logger.info("Text Analysis Completed")
     except Exception as e:

@@ -128,7 +128,7 @@ if __name__ == '__main__':
         log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         logging.basicConfig(level=logging.INFO, format=log_fmt,
                             handlers= [
-                                logging.FileHandler("{}/src/data/logs/CoinMarketCap.log".format(project_dir), mode = "w"),
+                                logging.FileHandler("{}/logs/CoinMarketCap.log".format(project_dir), mode = "w"),
                                 logging.StreamHandler()
                             ])
 
