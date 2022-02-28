@@ -5,25 +5,38 @@ import logging
 import pandas as pd
 from pathlib import Path
 
+from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
 logger = logging.getLogger("TextProcessing")
 project_dir = "./"
 
 text_process_config = json.load(open("{}/src/data/config/text_process_config.json".format(project_dir)))
 
-def tokenize(input_text):
+
+def analyze_sentiment(text):
+    """
+        Using VADER perform sentiment analysis on the given text
+    """
+    sentiment_analyzer = SentimentIntensityAnalyzer()
+    sentiment_dict = sentiment_analyzer.polarity_scores(text)
+
+    return sentiment_dict
+
+
+## DATA CLEANING ##
+def clean_text(input_text):
     """
         We begin with tokenization - we split our text into just words
         all words will be lowercase and punctuation will be removed
     """
-    reg_expressions = [r'http\S+',  # Remove any hyperlinks
-                       r'[\W]+',    # Identify words
-                       r'[0-9]+'    # Identify and remove numbers
+    reg_expressions = [r'http\S+',      # Remove any hyperlinks
+                       r'[^\x00-\x7F]+' # Remove non-ascii characters
+                       r'[\W]+',        # Identify words
                       ]
     for reg in reg_expressions:
         input_text = re.sub(reg, " ", input_text)
 
-    return input_text.lower()
-
+    return input_text
 
 def filter_raw(loaded_raw):
     """
@@ -32,7 +45,7 @@ def filter_raw(loaded_raw):
     tokenized_text = ""
 
     try:
-        tokenized_text = [token for token in tokenize(loaded_raw).split(" ") if len(token) > 1]
+        tokenized_text = [token for token in clean_text(loaded_raw).split(" ") if len(token) > 1]
         tokenized_text = " ".join(tokenized_text)
     except Exception as e:
         logger.error("An Error Occured Tokenizing : {}".format(e))
@@ -47,6 +60,8 @@ def validate_key(data, key):
         return data[key[0]]
     except Exception as e:
         return "NAN"
+
+## PROCESSING DATA ##
 
 def process_data(filename):
     """
@@ -63,7 +78,14 @@ def process_data(filename):
         # Apply our text filter to this new column
         processed_data["source"] = validate_key(loaded_raw, ["subreddit"])
         processed_data["timestamp"] = validate_key(loaded_raw, ["created_utc"])
-        processed_data["data"] = validate_key(loaded_raw, ["combined_text_data"]).apply(filter_raw)
+
+        # Process the text data
+        text_data = validate_key(loaded_raw, ["combined_text_data"]).apply(filter_raw)
+
+        sentiment = text_data.apply(analyze_sentiment)
+
+        processed_data["data"] = text_data
+        processed_data["sentiment"] = sentiment
         processed_data["score"] = validate_key(loaded_raw, ["score"])
 
     except Exception as e:
