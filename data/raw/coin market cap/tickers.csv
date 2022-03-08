@@ -1,0 +1,101 @@
+,ID,Coin,Slug
+0,1,Bitcoin,bitcoin
+1,1027,Ethereum,ethereum
+2,825,Tether,tether
+3,1839,BNB,bnb
+4,3408,USD Coin,usd-coin
+5,52,XRP,xrp
+6,2010,Cardano,cardano
+7,5426,Solana,solana
+8,4172,Terra,terra-luna
+9,5805,Avalanche,avalanche
+10,4687,Binance USD,binance-usd
+11,6636,Polkadot,polkadot-new
+12,74,Dogecoin,dogecoin
+13,5994,Shiba Inu,shiba-inu
+14,7129,TerraUSD,terrausd
+15,3890,Polygon,polygon
+16,3635,Cronos,cronos
+17,3717,Wrapped Bitcoin,wrapped-bitcoin
+18,4943,Dai,multi-collateral-dai
+19,3794,Cosmos,cosmos
+20,2,Litecoin,litecoin
+21,7083,Uniswap,uniswap
+22,1975,Chainlink,chainlink
+23,1958,TRON,tron
+24,1831,Bitcoin Cash,bitcoin-cash
+25,4195,FTX Token,ftx-token
+26,3957,UNUS SED LEO,unus-sed-leo
+27,6535,NEAR Protocol,near-protocol
+28,4030,Algorand,algorand
+29,1966,Decentraland,decentraland
+30,512,Stellar,stellar
+31,4642,Hedera,hedera
+32,3513,Fantom,fantom
+33,4023,Bitcoin BEP2,bitcoin-bep2
+34,1321,Ethereum Classic,ethereum-classic
+35,8916,Internet Computer,internet-computer
+36,2280,Filecoin,filecoin
+37,6210,The Sandbox,the-sandbox
+38,4256,Klaytn,klaytn
+39,6892,Elrond,elrond-egld
+40,6783,Axie Infinity,axie-infinity
+41,3077,VeChain,vechain
+42,328,Monero,monero
+43,2011,Tezos,tezos
+44,2416,Theta Network,theta-network
+45,5665,Helium,helium
+46,1765,EOS,eos
+47,1720,IOTA,iota
+48,4558,Flow,flow
+49,7278,Aave,aave
+50,1518,Maker,maker
+51,7186,PancakeSwap,pancakeswap
+52,16086,BitTorrent (New),bittorrent-new
+53,3945,Harmony,harmony
+54,7080,Gala,gala
+55,6719,The Graph,the-graph
+56,3602,Bitcoin SV,bitcoin-sv
+57,2087,KuCoin Token,kucoin-token
+58,2563,TrueUSD,trueusd
+59,4847,Stacks,stacks
+60,1376,Neo,neo
+61,1437,Zcash,zcash
+62,2502,Huobi Token,huobi-token
+63,10791,eCash,ecash
+64,1274,Waves,waves
+65,3155,Quant,quant
+66,2130,Enjin Coin,enjin-coin
+67,4157,THORChain,thorchain
+68,6945,Amp,amp
+69,2694,Nexo,nexo
+70,5647,Kadena,kadena
+71,4066,Chiliz,chiliz
+72,5632,Arweave,arweave
+73,1697,Basic Attention Token,basic-attention-token
+74,3897,OKB,okb
+75,5034,Kusama,kusama
+76,6538,Curve DAO Token,curve-dao-token
+77,5567,Celo,celo
+78,1934,Loopring,loopring
+79,131,Dash,dash
+80,3330,Pax Dollar,paxos-standard
+81,873,NEM,nem
+82,8857,Anchor Protocol,anchor-protocol
+83,9903,Convex Finance,convex-finance
+84,3822,Theta Fuel,theta-fuel
+85,5604,Secret,secret
+86,3801,BORA,bora
+87,8677,Symbol,symbol
+88,7653,Oasis Network,oasis-network
+89,1168,Decred,decred
+90,8646,Mina,mina
+91,5692,Compound,compound
+92,5864,yearn.finance,yearn-finance
+93,2682,Holo,holo
+94,2700,Celsius,celsius
+95,2777,IoTeX,iotex
+96,2634,XDC Network,xinfin
+97,2577,Ravencoin,ravencoin
+98,1659,Gnosis,gnosis-gno
+99,1684,Qtum,qtum
