@@ -1,4 +1,6 @@
 
+from cgitb import text
+from concurrent.futures import process
 import re
 import json
 import logging
@@ -12,13 +14,14 @@ project_dir = "./"
 
 text_process_config = json.load(open("{}/src/data/config/text_process_config.json".format(project_dir)))
 
+terms = text_process_config["terms"].split(", ")
 
-def analyze_sentiment(text):
+def analyze_sentiment(input_text):
     """
         Using VADER perform sentiment analysis on the given text
     """
     sentiment_analyzer = SentimentIntensityAnalyzer()
-    sentiment_dict = sentiment_analyzer.polarity_scores(text)
+    sentiment_dict = sentiment_analyzer.polarity_scores(input_text)
 
     return sentiment_dict
 
@@ -38,19 +41,30 @@ def clean_text(input_text):
 
     return input_text
 
-def filter_raw(loaded_raw):
+def filter_raw(input_text):
     """
         defines all necessary steps to filter our raw data including adding to our bag of words
     """
     tokenized_text = ""
 
     try:
-        tokenized_text = [token for token in clean_text(loaded_raw).split(" ") if len(token) > 1]
+        tokenized_text = [token for token in clean_text(input_text).split(" ") if len(token) > 1]
         tokenized_text = " ".join(tokenized_text)
     except Exception as e:
         logger.error("An Error Occured Tokenizing : {}".format(e))
     finally:
         return tokenized_text
+
+
+def keyword_search(input_text):
+    punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
+    for element in input_text:
+        if element in punc:
+            input_text = input_text.replace(element, "")
+
+    input_text = input_text.split(" ")
+    return [term for term in terms if term in input_text]
+
 
 def validate_key(data, key):
     """
@@ -83,9 +97,12 @@ def process_data(filename):
         text_data = validate_key(loaded_raw, ["combined_text_data"]).apply(filter_raw)
 
         sentiment = text_data.apply(analyze_sentiment)
+        keywords = text_data.apply(keyword_search)
 
         processed_data["data"] = text_data
         processed_data["sentiment"] = sentiment
+        processed_data["keywords"] = keywords
+
         processed_data["score"] = validate_key(loaded_raw, ["score"])
 
     except Exception as e:
@@ -93,6 +110,15 @@ def process_data(filename):
 
     finally:
         return processed_data
+
+
+### SUMMARIZE DATA ###
+def summarize_data():
+    data_summary = []
+
+    return data_summary
+
+
 
 if __name__ == '__main__':
     try:

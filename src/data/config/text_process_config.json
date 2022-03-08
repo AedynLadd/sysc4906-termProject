@@ -1,3 +1,7 @@
 {
-    "data_stores": ["reddit", "twitter"]
+    "data_stores": [
+        "reddit",
+        "twitter"
+    ],
+    "terms": "bitcoin, BTC, ethereum, ETH, tether, USDT, bnb, BNB, usd-coin, USDC, xrp, XRP, terra-luna, LUNA, cardano, ADA, solana, SOL, avalanche, AVAX, binance-usd, BUSD, polkadot-new, DOT, dogecoin, DOGE, terrausd, UST, shiba-inu, SHIB, polygon, MATIC, wrapped-bitcoin, WBTC, multi-collateral-dai, DAI, cronos, CRO, cosmos, ATOM, litecoin, LTC, near-protocol, NEAR, wrapped-tron, WTRX, tron, TRX, chainlink, LINK, uniswap, UNI, ftx-token, FTT, bitcoin-cash, BCH, unus-sed-leo, LEO, algorand, ALGO, decentraland, MANA, stellar, XLM, hedera, HBAR, bitcoin-bep2, BTCB, ethereum-classic, ETC, internet-computer, ICP, fantom, FTM, the-sandbox, SAND, filecoin, FIL, vechain, VET, klaytn, KLAY, elrond-egld, EGLD, monero, XMR, theta-network, THETA, axie-infinity, AXS, tezos, XTZ, waves, WAVES, helium, HNT, flow, FLOW, iota, MIOTA, eos, EOS, maker, MKR, bittorrent-new, BTT, pancakeswap, CAKE, aave, AAVE, zcash, ZEC, the-graph, GRT, harmony, ONE, gala, GALA, bitcoin-sv, BSV, trueusd, TUSD, kucoin-token, KCS, neo, NEO, huobi-token, HT, thorchain, RUNE, stacks, STX, quant, QNT, ecash, XEC, celo, CELO, chiliz, CHZ, enjin-coin, ENJ, nexo, NEXO, amp, AMP, okb, OKB, anchor-protocol, ANC, arweave, AR, kusama, KSM, kadena, KDA, basic-attention-token, BAT, loopring, LRC, paxos-standard, USDP, dash, DASH, curve-dao-token, CRV, nem, XEM, convex-finance, CVX, theta-fuel, TFUEL, oasis-network, ROSE, symbol, XYM, mina, MINA, decred, DCR, bora, BORA, secret, SCRT, holo, HOT, yearn-finance, YFI, celsius, CEL, compound, COMP, iotex, IOTX, sxp, SXP, ankr, ANKR, xinfin, XDC"
 }

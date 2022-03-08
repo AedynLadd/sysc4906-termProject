@@ -78,10 +78,18 @@ def get_top_100_coins(upper_limit = 100):
     
     # Identify the cryptocurrency map from the response
     cryptocurrencyMap = response.json()["data"]["cryptoCurrencyMap"]
-
+    
+    x = ""
+    for coin in cryptocurrencyMap:
+        x += "{}, {}, ".format(coin["slug"],coin["symbol"])
+    
+    cryptoMapRef = {
+        "keyword_metadata": x[0:len(x) - 2],
+        "coins": cryptocurrencyMap
+    }
     # Save the data for future reference
     with open('{}/data/raw/coinmarketcap/top_100_coins.json'.format(project_dir), 'w') as openfile:
-        json.dump(cryptocurrencyMap, openfile)
+        json.dump(cryptoMapRef, openfile)
 
     return cryptocurrencyMap
 
@@ -92,7 +100,7 @@ def pull_coinmarketcap_data():
     try:
         # Get the top 100 crypto currencies
         top_100 = get_top_100_coins()
-
+        return 1
         # Create a blank dictionary where we will store our historical data records
         historical_crypto_data = {}
 
