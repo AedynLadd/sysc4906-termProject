@@ -27,6 +27,9 @@ https://www.overleaf.com/8239623562pxkkmdjdtbsg
 ## Progress Report
 https://www.overleaf.com/1613467463dczmnhxynwsj
 
+## Dashboard Link
+http://4906termprojectdashboard-env.eba-dfx3vj5u.us-east-1.elasticbeanstalk.com/
+
 ## Project Folder Structure
 ├── LICENSE <br/>
 ├── Makefile           <- Makefile with commands like `make data` or `make train`  <br/>
