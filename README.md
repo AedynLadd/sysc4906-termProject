@@ -28,7 +28,7 @@ https://www.overleaf.com/8239623562pxkkmdjdtbsg
 https://www.overleaf.com/1613467463dczmnhxynwsj
 
 ## Dashboard Link
-https://sysc4906dashboard.s3.amazonaws.com/index.html
+https://aedynladd.github.io/sysc4906-termProject/
 
 ## Project Folder Structure
 ├── LICENSE <br/>
