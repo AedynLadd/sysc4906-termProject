@@ -1,4 +1,4 @@
-{
+const reddit_summary = {
     "1553385600000": {
         "number_of_posts": 1,
         "overall_positivity_sum": 0.846,
