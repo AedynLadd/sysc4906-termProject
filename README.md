@@ -28,7 +28,7 @@ https://www.overleaf.com/8239623562pxkkmdjdtbsg
 https://www.overleaf.com/1613467463dczmnhxynwsj
 
 ## Dashboard Link
-http://4906termprojectdashboard-env.eba-dfx3vj5u.us-east-1.elasticbeanstalk.com/
+https://sysc4906dashboard.s3.amazonaws.com/index.html
 
 ## Project Folder Structure
 ├── LICENSE <br/>
