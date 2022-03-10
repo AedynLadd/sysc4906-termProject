@@ -100,7 +100,7 @@ def pull_coinmarketcap_data():
     try:
         # Get the top 100 crypto currencies
         top_100 = get_top_100_coins()
-        return 1
+        
         # Create a blank dictionary where we will store our historical data records
         historical_crypto_data = {}
 

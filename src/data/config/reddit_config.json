@@ -1,5 +1,5 @@
 {
-    "default_days": 1,
+    "default_days": 30,
     "default_keywords": ["bitcoin", "testing"],
     "subreddits": [
         {

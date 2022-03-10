@@ -5,16 +5,15 @@ import time
 import json
 import logging
 import datetime
-from xmlrpc.client import boolean
 import numpy
 import pandas as pd
 from pathlib import Path
 
-logger = logging.getLogger("TextProcessing")
+logger = logging.getLogger("SummarizeData")
 project_dir = "./"
 
 def boolean_df(item_lists, unique_items):
-# Create empty dict
+    # Create empty dict
     bool_dict = {}
     
     # Loop through all the tags
@@ -26,36 +25,43 @@ def boolean_df(item_lists, unique_items):
     return pd.DataFrame(bool_dict)
 
 def sub_df_analysis(x):
-    number_posts = x["data"].count()
+    try:
+        number_posts = x["data"].count()
 
-    sentiment_df = pd.DataFrame()
-    sentiment_df["positive_sentiment"] = (x["sentiment"].map(lambda v: v["pos"]) * x["score"])
-    sentiment_df["negative_sentiment"] = (x["sentiment"].map(lambda v: v["neg"]) * x["score"])
-    sentiment_df["neutral_sentiment"]  = (x["sentiment"].map(lambda v: v["neu"]) * x["score"])
+        sentiment_df = pd.DataFrame()
+        sentiment_df["positive_sentiment"] = (x["sentiment"].map(lambda v: v["pos"]) * x["score"])
+        sentiment_df["negative_sentiment"] = (x["sentiment"].map(lambda v: v["neg"]) * x["score"])
+        sentiment_df["neutral_sentiment"]  = (x["sentiment"].map(lambda v: v["neu"]) * x["score"])
 
-    unique_keywords = [keyword for keyword in x["keywords"].explode(ignore_index=True).unique() if not pd.isnull(keyword)]
+        unique_keywords = [keyword for keyword in x["keywords"].explode(ignore_index=True).unique() if not pd.isnull(keyword)]
 
-    boolean_mask = boolean_df(x["keywords"], unique_keywords)
+        boolean_mask = boolean_df(x["keywords"], unique_keywords)
 
-    if boolean_mask.empty:
-        return pd.Series({
-            "number_of_posts": number_posts,
-            "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
-            "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
-            "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
-            "keyword_based_sentiment": {}
-            })
-    else:
-        keyword_sentiment_mask = (boolean_mask.multiply(sentiment_df["positive_sentiment"], axis="index") + (-1*boolean_mask.multiply(sentiment_df["negative_sentiment"], axis="index"))).sum()
-        print(keyword_sentiment_mask.to_dict())
-
-        return pd.Series({
-            "number_of_posts": number_posts,
-            "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
-            "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
-            "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
-            "keyword_based_sentiment": keyword_sentiment_mask.to_dict()
-            })
+        if boolean_mask.empty:
+            return pd.Series({
+                "number_of_posts": number_posts,
+                "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
+                "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
+                "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
+                "keyword_based_sentiment": {}
+                })
+        else:
+            keyword_post_count_mask = boolean_mask.sum()
+            keyword_sentiment_mask = (boolean_mask.multiply(sentiment_df["positive_sentiment"], axis="index") + (-1*boolean_mask.multiply(sentiment_df["negative_sentiment"], axis="index"))).sum()
+            
+            test = pd.concat([keyword_post_count_mask.rename("count"), keyword_sentiment_mask.rename("sentiment")], axis=1, join="inner").transpose()
+            
+            return pd.Series({
+                "number_of_posts": number_posts,
+                "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
+                "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
+                "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
+                "keyword_based_sentiment": test.to_dict()
+                })
+    except Exception as e:
+        print(x)
+        logger.error("An error occured {}".format(e))
+            
 
 
 def summarize_data(data_file):
