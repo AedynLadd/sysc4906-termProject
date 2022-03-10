@@ -1,12 +1,33 @@
-# sysc4906-termProject
- 
+# SYSC 4906 Term Project
+By gathering data from reddit we will be analyzing the sentiment of posts in communities that have strong interests in investment, cryptocurrency, and world politics. We will determine if there exists a link between these sentiments and the flucuation of cryptocurrencies, and if a link exists if it can be used to accurately predict future market behaviour as a consequence of social media based mass hysteria among these populations. The code we have compiled for the initial data munging phase can be found at the Github Repository linked below.  
+
+## Getting Started
+
+### Initial Data Munging and Analysis
+The files found in src/data can be used for performing intial data analysis:
+<br>
+<b>src/data/config</b> contains a configuration file that can be used to define several functions:
+ - where data from reddit is being pulled from (ie. what subreddit)
+ - with what keywords should we focus on (if any keywords are included, otherwise we can use a set of default keywords, or pull all the data)
+ - How many days in the past should we pull from
+<br><br>
+
+<b>src/data/raw_reddit_data.py</b> using the config file mentioned above, this script will pull data from reddit. To do this it uses a bot, in order to run this code properly a .env file needs to be configured. Please email me (aedynladd@cmail.carleton.ca) for the data necessary for the .env file
+
+<br><br>
+<b>src/data/text_process.py</b> this script will pull all the previously collected data into a single file, perform analysis on sentiment in posts, and organize by the days that posts occured
+
+<br><br>
+<b>src/data/summarize_data.py</b> this script creates a summary of all the afformentioned data grouped per day, displaying information such as the combined sentiment, number of posts, and sentiment as it relates to keywords.
+
+
 ## Project Proposal
 https://www.overleaf.com/8239623562pxkkmdjdtbsg
 
 ## Progress Report
 https://www.overleaf.com/1613467463dczmnhxynwsj
 
-## Folder Structure
+## Project Folder Structure
 ├── LICENSE <br/>
 ├── Makefile           <- Makefile with commands like `make data` or `make train`  <br/>
 ├── README.md          <- The top-level README for developers using this project. <br/>
@@ -27,7 +48,6 @@ https://www.overleaf.com/1613467463dczmnhxynwsj
 ├── references         <- Data dictionaries, manuals, and all other explanatory materials. <br/>
 │ <br/>
 ├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc. <br/>
-│   └── figures        <- Generated graphics and figures to be used in reporting <br/>
 │ <br/>
 ├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g. <br/>
 │                         generated with `pip freeze > requirements.txt` <br/>
@@ -37,17 +57,13 @@ https://www.overleaf.com/1613467463dczmnhxynwsj
 │   ├── __init__.py    <- Makes src a Python module <br/>
 │   │ <br/>
 │   ├── data           <- Scripts to download or generate data <br/>
-│   │   └── make_dataset.py <br/>
+|        └── Config    <- Config files for running scripts
 │   │ <br/>
 │   ├── features       <- Scripts to turn raw data into features for modeling <br/>
-│   │   └── build_features.py <br/>
 │   │ <br/>
 │   ├── models         <- Scripts to train models and then use trained models to make <br/>
-│   │   │                 predictions <br/>
-│   │   ├── predict_model.py <br/>
-│   │   └── train_model.py <br/>
 │   │ <br/>
 │   └── visualization  <- Scripts to create exploratory and results oriented visualizations <br/>
-│       └── visualize.py <br/>
 │ <br/>
 └── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io <br/>
+
