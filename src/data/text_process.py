@@ -12,9 +12,7 @@ from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 logger = logging.getLogger("TextProcessing")
 project_dir = "./"
 
-text_process_config = json.load(open("{}/src/data/config/text_process_config.json".format(project_dir)))
 
-terms = text_process_config["terms"].split(", ")
 
 def analyze_sentiment(input_text):
     """
@@ -123,6 +121,10 @@ def summarize_data():
 if __name__ == '__main__':
     try:
         project_dir = Path(__file__).resolve().parents[2]
+        text_process_config = json.load(open("{}/src/data/config/text_process_config.json".format(project_dir)))
+
+        terms = text_process_config["terms"].split(", ")
+
         log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         logging.basicConfig(level=logging.INFO, format=log_fmt,
                             handlers= [
