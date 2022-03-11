@@ -1,46 +1,27 @@
 {
-    "default_days": 30,
-    "default_keywords": ["bitcoin", "testing"],
+    "default_days": 7,
+    "default_keywords": ["btc"],
     "subreddits": [
         {
             "sub_name": "CryptoCurrency",
             "keywords": {
                 "use_defaults": true,
-                "extras": ["crypto"]
+                "extras": []
             }
         }, 
         {   
-            "sub_name": "bitcoin"
+            "sub_name": "bitcoin",
+            "keywords": {
+                "use_defaults": true,
+                "extras": []
+            }
         },
         {   
-            "sub_name": "btc"
-        },
-        {   
-            "sub_name": "CryptoMarkets"
-        },
-        {   
-            "sub_name": "bitcoinbeginners"
-        },
-        {   
-            "sub_name": "cryptoCurrencies"
-        },
-        {
-            "sub_name": "altcoin"
-        },
-        {   
-            "sub_name": "icocrypto"
-        },
-        {   
-            "sub_name": "CryptoCurrencyTrading"
-        },
-        {
-            "sub_name": "ethereum"
-        },
-        {
-            "sub_name": "binance"
-        },
-        {   
-            "sub_name": "CoinBase"
+            "sub_name": "btc",
+            "keywords": {
+                "use_defaults": true,
+                "extras": []
+            }
         }
     ]
 }

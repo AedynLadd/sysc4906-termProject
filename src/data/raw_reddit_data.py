@@ -81,31 +81,31 @@ def make_reddit_request(url, params, authentication, subreddit_name, days_ago):
             res = requests.get(url=url, headers= authentication, params=params)
 
             if(res.status_code == 200):
-                logger.info("Success pulling data from {}".format(subreddit_name))
+                    logger.info("Success pulling data from {}".format(subreddit_name))
 
-                subreddit_slice, last_id, last_post = restructure_subreddit_data(res.json())
+                    subreddit_slice, last_post = restructure_subreddit_data(res.json())
+            
+                    collected_data = collected_data.append(subreddit_slice, ignore_index=True)
+                    logger.info("Last data pull was from: {}".format(time.ctime(last_post)))
 
-                collected_data = collected_data.append(subreddit_slice, ignore_index=True)
-                logger.info("Last data pull was from: {}".format(time.ctime(last_post)))
-
-                if((int(time.time()) - int(last_post)) >= days_ago*86400 ): # time difference is more than a certain span of seconds (86400 secs in a day)
-                    # Break out by throwing a 'Done' error
-                    raise Exception("Done")
-                else:
-                    # set the last id parameters to know where we should pull from next
-                    params["after"] = last_id
-
+                    if((int(time.time()) - int(last_post)) >= days_ago*86400 ): # time difference is more than a certain span of seconds (86400 secs in a day)
+                        # Break out by throwing a 'Done' error
+                        raise Exception("Done")
+                    else:
+                        # set the last id parameters to know where we should pull from next
+                        params["after"] = last_id
             else:
                 logger.error("Status code {} recieved".format(res.status_code))
                 raise Exception("Failure pulling data")
 
             # Wait 2 seconds before next call to reddit API
-            time.sleep(1)
+            time.sleep(2)
     except Exception as e:
         if(e.args[0] == "Done"):
             logger.info("PULL OF DATA FROM r/{} IS DONE".format(subreddit_name))
         else:
             logger.error(e)
+            logger.error("Tried searching with response: {}".format(res.json()))
 
     return collected_data
 
@@ -114,6 +114,7 @@ def pull_subreddit_keyword(subreddit_name, authentication, keywords, days_ago = 
     """
         Pull all posts with keywords from a subreddit between now and the specificed amount of days prior
     """
+    logger.info("keyword pull being used")
     keyword_query = str(" OR ").join(keywords)
 
     params = {
@@ -140,6 +141,7 @@ def pull_subreddit_data(subreddit_name, authentication, days_ago = 1):
     """
         pull all posts from a subreddit between now and the specified amount of days prior
     """
+    logger.info("pulling last 1000 items")
     params = {'limit': 100}
     subreddit_data = pd.DataFrame()
     
@@ -187,7 +189,7 @@ def reddit():
                 # First check if we want to search using the default keywords
                 keywords_to_search = subreddits_to_explore["default_keywords"] if (this_subreddit["keywords"]["use_defaults"]) else []
                 keywords_to_search += this_subreddit["keywords"]["extras"] if(len(this_subreddit["keywords"]["extras"]) > 0) else []
-
+                print("keywords to search {}".format(keywords_to_search))
                 if(len(keywords_to_search) < 1):
                     raise ValueError("No keywords are listed")
 
@@ -200,6 +202,7 @@ def reddit():
                     )
 
             except KeyError as e:
+                print(e)
                 logger.info("Performing a Subreddit pull")
                 # If no keyword data exists then we pull all data from the subreddit up to x days in the past
                 subreddit_pull = pull_subreddit_data(this_subreddit["sub_name"], 
