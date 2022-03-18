@@ -18,11 +18,11 @@ const svg = d3.select("#coin_chart_data")
 // List of groups (here I have one group per column)
 var allGroup = Object.keys(historical_coin_data)
 
-function create_coin_label(name_of_coin){
+function create_coin_label(name_of_coin) {
     coin_name_ids = name_of_coin.split(" ").join("_")
     return [
-        "<div class='coin_label' id='coin_id_" + coin_name_ids + "' onclick=update_graph('" + coin_name_ids + "')>", 
-        name_of_coin, 
+        "<div class='coin_label' id='coin_id_" + coin_name_ids + "' onclick=update_graph('" + coin_name_ids + "')>",
+        name_of_coin,
         "</div>"
     ]
 }
@@ -33,6 +33,17 @@ allGroup.forEach(e => document.getElementById("coin_select").innerHTML += create
 var myColor = d3.scaleOrdinal()
     .domain(allGroup)
     .range(d3.schemeSet2);
+
+var areaGradient = svg.append("defs")
+    .append("linearGradient")
+    .attr("id", "areaGradient")
+    .attr("x1", "0%").attr("y1", "0%")
+    .attr("x2", "0%").attr("y2", "100%");
+
+var area_top_col = areaGradient.append("stop")
+
+var area_bottom_col = areaGradient.append("stop")
+
 
 
 var x_axis = svg.append("g")
@@ -74,9 +85,21 @@ function update_graph(selectedGroup) {
         .datum(rearrangedData)
         .transition()
         .duration(1000)
-        .attr("d", d3.line().x(function (d) { return new_x(new Date(d.timestamp)) }).y(function (d) { return new_y(+d.data) }))
+        .attr("d", d3.area()
+            .x(function (d) { return new_x(new Date(d.timestamp)) })
+            .y0(function (d) { return new_y(0) })
+            .y1(function (d) { return new_y(+d.data) })
+        )
+
         .attr("stroke", function (d) { return myColor(selectedGroup) })
-        .attr("fill", "none")
+        .attr("fill", "url(#areaGradient)")
+
+    area_top_col.transition().duration(1000).attr("offset", "0%")
+        .attr("stop-color", myColor(selectedGroup) + "A0");
+
+    area_bottom_col.transition().duration(1000).attr("offset", "100%")
+        .attr("stop-color", "none")
+        .attr("stop-opacity", 0);
 }
 
 // When the button is changed, run the updateChart function
