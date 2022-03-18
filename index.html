@@ -1,17 +1,21 @@
 <!DOCTYPE html>
 <html>
+
 <head>
   <title>SYSC 4906 Term Project</title>
   <link rel="stylesheet" href="dashboard/css/index.css">
   <script src="https://d3js.org/d3.v6.js"></script>
 </head>
-<body>
-  <!-- Initialize a select button -->
-  <select id="selectButton"></select>
 
-  <!-- Create a div where the graph will take place -->
-  <div id="my_dataviz"></div>
+<body>
+  <div id="main_body" class="grid-container">
+    <div class ="coin_select" id="coin_select"></div>
+    <div class ="coin_info">
+      <div class="coin_chart_data" id = "coin_chart_data"></div>
+    </div>
+  </div>
 </body>
 <script type="text/javascript" src="dashboard/data/historical_data.js"></script>
 <script type="text/javascript" src="dashboard/scripts/crypto_linechart.js"></script>
+
 </html>
