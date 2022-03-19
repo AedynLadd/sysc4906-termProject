@@ -83,7 +83,7 @@ def make_reddit_request(url, params, authentication, subreddit_name, days_ago):
             if(res.status_code == 200):
                     logger.info("Success pulling data from {}".format(subreddit_name))
 
-                    subreddit_slice, last_post = restructure_subreddit_data(res.json())
+                    subreddit_slice, last_id, last_post = restructure_subreddit_data(res.json())
             
                     collected_data = collected_data.append(subreddit_slice, ignore_index=True)
                     logger.info("Last data pull was from: {}".format(time.ctime(last_post)))

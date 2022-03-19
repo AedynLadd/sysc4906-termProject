@@ -1,27 +1,48 @@
 {
-    "default_days": 7,
+    "default_days": 365,
     "default_keywords": ["btc"],
     "subreddits": [
         {
             "sub_name": "CryptoCurrency",
             "keywords": {
-                "use_defaults": true,
+                "use_defaults": false,
                 "extras": []
             }
         }, 
         {   
             "sub_name": "bitcoin",
             "keywords": {
-                "use_defaults": true,
+                "use_defaults": false,
                 "extras": []
             }
         },
         {   
             "sub_name": "btc",
             "keywords": {
-                "use_defaults": true,
+                "use_defaults": false,
                 "extras": []
             }
+        },
+        {
+            "sub_name": "CryptoMarkets"
+        },
+        {
+            "sub_name": "CryptoCurrencyTrading"
+        },
+        {
+            "sub_name": "Crypto_General"
+        },
+        {
+            "sub_name": "blockchain"
+        },
+        {
+            "sub_name": "ico"
+        },
+        {
+            "sub_name": "icocrypto"
+        },
+        {
+            "sub_name": "WallStreetBets"
         }
     ]
 }

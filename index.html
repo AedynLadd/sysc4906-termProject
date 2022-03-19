@@ -12,10 +12,17 @@
     <div class ="coin_select" id="coin_select"></div>
     <div class ="coin_info">
       <div class="coin_chart_data" id = "coin_chart_data"></div>
+      <div class="coin_sentiment_heatmap" id="coin_sentiment_heatmap"></div>
     </div>
   </div>
 </body>
+<!--  DATA VARIABLES -->
+<!--  Data variables need to be loaded in first, and then visualization scripts can be loaded to actually perform visualization tasks on them -->
 <script type="text/javascript" src="dashboard/data/historical_data.js"></script>
+<script type="text/javascript" src="dashboard/data/top_100_coins.js"></script>
+<script type="text/javascript" src="dashboard/data/reddit_summary.js"></script>
+<!--  VISUALIZATION SCRIPTS  -->
 <script type="text/javascript" src="dashboard/scripts/crypto_linechart.js"></script>
-
+<script type="text/javascript" src="dashboard/scripts/sentiment_heatmap.js"></script>
+<script type="text/javascript" src="dashboard/scripts/update_coin.js"></script>
 </html>

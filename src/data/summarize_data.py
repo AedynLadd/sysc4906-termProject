@@ -26,6 +26,10 @@ def boolean_df(item_lists, unique_items):
 
 def sub_df_analysis(x):
     try:
+        time_group = x.iloc[0]["timestamp"]
+        subreddit_group = x.iloc[0]["source"]
+
+        print(subreddit_group)
         number_posts = x["data"].count()
 
         sentiment_df = pd.DataFrame()
@@ -39,6 +43,8 @@ def sub_df_analysis(x):
 
         if boolean_mask.empty:
             return pd.Series({
+                "source": subreddit_group,
+                "timestamp": time_group,
                 "number_of_posts": number_posts,
                 "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
                 "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
@@ -52,6 +58,8 @@ def sub_df_analysis(x):
             test = pd.concat([keyword_post_count_mask.rename("count"), keyword_sentiment_mask.rename("sentiment")], axis=1, join="inner").transpose()
             
             return pd.Series({
+                "source": subreddit_group,
+                "timestamp": time_group,
                 "number_of_posts": number_posts,
                 "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
                 "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
@@ -59,14 +67,13 @@ def sub_df_analysis(x):
                 "keyword_based_sentiment": test.to_dict()
                 })
     except Exception as e:
-        print(x)
         logger.error("An error occured {}".format(e))
             
 
 
 def summarize_data(data_file):
 
-    summarized_data = data_file.groupby(["timestamp"]).apply(sub_df_analysis)
+    summarized_data = data_file.groupby(["timestamp", "source"]).apply(sub_df_analysis)
     
     return summarized_data
 

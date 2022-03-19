@@ -17,18 +17,18 @@ body {
 
 .grid-container>div{
     background-color: rgba(255, 255, 255, 0.1);
-    border: solid 1px rgba(255, 255, 255, 0.295);
     border-radius: 1px;
     margin: 5px 5px 5px 5px;
 }
 
 .coin_select {
     overflow-y: auto;
+    border-left: solid 5px rgb(255, 255, 255); 
     grid-area: 1 / 1 / 21 / 5;
 }
 
 .coin_label {
-    font-size: 25px;
+    font-size: 20px;
     color: rgba(194, 194, 194, 0.445);
     font-weight: bolder;
     margin-top: 15px;
@@ -36,11 +36,20 @@ body {
     padding-left: 15px;
 }
 
-
 .coin_label:hover{
-    border-left: solid 5px white;
-    color: rgb(194, 194, 194);
+    border-left: solid 2px rgba(255, 255, 255, 0.5);
+    color: rgba(194, 194, 194, 0.774);
     cursor: pointer;
+}
+
+.coin_selected {
+    font-size: 28px;
+    color: rgb(255, 255, 255);
+    border-left: solid 5px rgb(255, 255, 255);
+    font-weight: bolder;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-left: 15px;
 }
 
 /* SCROLL BAR STUFF */
@@ -52,6 +61,7 @@ body {
 .coin_info {
     grid-area: 1 / 5 / 21 / 21;
     display:grid;
+    border: solid 1px rgba(255, 255, 255, 0.295);
     grid-template-columns: repeat(20, 5%);
     grid-template-rows: repeat(20,5%);
     margin-left: 5px;
@@ -59,4 +69,9 @@ body {
 
 .coin_chart_data{
     grid-area: 1 / 1 / 7 / 21;
+}
+
+
+.coin_sentiment_heatmap{
+    grid-area: 7 / 1 / 21 / 10;
 }
