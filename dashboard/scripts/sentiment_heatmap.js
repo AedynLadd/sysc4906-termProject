@@ -43,18 +43,23 @@ var heat_y = d3.scaleBand()
     .range([heat_height, 0])
     .domain(Subreddits)
     .padding(0);
-    
+
 var heat_x_range = d3.scaleLinear()
     .domain([d3.min(Dates), d3.max(Dates)])
     .range([0, heat_width]);
 
 var heat_x_axis = heat_svg.append("g")
+    .attr("class", "heatmap_axis")
     .attr("transform", "translate(0," + heat_height + ")")
     .call(d3.axisBottom(heat_x_range).tickFormat(d => { return (new Date(d)).toLocaleDateString("en-CA") }));
 
-var heat_y_axis = heat_svg.append("g")
-    .call(d3.axisLeft(heat_y));
 
+var heat_y_axis = heat_svg.append("g")
+    .attr("class", "heatmap_axis")
+    .call(d3.axisLeft(heat_y).tickSize(0));
+
+heat_y_axis.selectAll(".tick text")
+    .style("font-size", "10px")
 
 var heatMapColor = d3.scaleSequential()
     .interpolator(d3.interpolateInferno)

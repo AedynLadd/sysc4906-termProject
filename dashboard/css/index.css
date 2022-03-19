@@ -5,9 +5,25 @@ body {
     overflow: hidden;
 }
 
+.dashboard_header{
+    position: absolute;
+    padding-left: 8%;
+    padding-top: 5px;
+    font-size: 30px;
+    font-weight: lighter;
+    color:rgb(255, 255, 255);
+    text-align: center;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background-color: rgba(207, 207, 207, 0.384);
+}
+
 .grid-container {
     position: absolute;
-    height: 100%;
+    top: 60px;
+    height: calc(100% - 60px);
     width:  99%;
     display: grid;
     grid-template-columns: repeat(20, 5%);
@@ -74,4 +90,9 @@ body {
 
 .coin_sentiment_heatmap{
     grid-area: 7 / 1 / 21 / 12;
+}
+
+.tick{
+    color: rgba(255, 255, 255, 0.4);
+    font-weight: bolder;
 }
