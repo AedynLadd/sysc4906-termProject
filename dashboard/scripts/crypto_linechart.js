@@ -69,7 +69,7 @@ function update_graph(selectedGroup) {
         .domain(d3.extent(historical_coin_data[selectedGroup]["timestamp"], function (d) { return new Date(d) }))
         .range([0, line_width]);
 
-    x_axis.call(d3.axisBottom(new_x).ticks(7));
+    x_axis.call(d3.axisBottom(new_x).ticks(7).tickFormat(d => { return (new Date(d)).toLocaleDateString("en-CA") }));
 
     // Add Y axis
     var new_y = d3.scaleLinear()

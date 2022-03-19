@@ -12,7 +12,7 @@ top_100_coins.forEach(coin => coin_map_to_name[coin.name] = { "name": coin.name,
 var heatmap_container_bounds = document.getElementById("coin_sentiment_heatmap").getBoundingClientRect();
 
 // set the dimensions and margins of the graph
-const heat_margin = { top: 10, right: 30, bottom: 30, left: 20 },
+const heat_margin = { top: 10, right: 30, bottom: 30, left: 60 },
     heat_width = heatmap_container_bounds.width - heat_margin.left - heat_margin.right,
     heat_height = heatmap_container_bounds.height - heat_margin.top - heat_margin.bottom;
 
@@ -33,35 +33,47 @@ Object.values(reddit_summary).forEach(val => {
 })
 
 // Build X scales and axis:
-var x = d3.scaleBand()
+var heat_x = d3.scaleBand()
     .range([0, heat_width])
     .domain(Dates)
     .padding(0);
 
 // Build Y scales and axis:
-var y = d3.scaleBand()
+var heat_y = d3.scaleBand()
     .range([heat_height, 0])
     .domain(Subreddits)
     .padding(0);
+    
+var heat_x_range = d3.scaleLinear()
+    .domain([d3.min(Dates), d3.max(Dates)])
+    .range([0, heat_width]);
+
+var heat_x_axis = heat_svg.append("g")
+    .attr("transform", "translate(0," + heat_height + ")")
+    .call(d3.axisBottom(heat_x_range).tickFormat(d => { return (new Date(d)).toLocaleDateString("en-CA") }));
+
+var heat_y_axis = heat_svg.append("g")
+    .call(d3.axisLeft(heat_y));
+
 
 var heatMapColor = d3.scaleSequential()
     .interpolator(d3.interpolateInferno)
     .domain([0, 1])
 
 fill_data = []
-Dates.forEach(thisDate => { Subreddits.forEach(thisSub => { fill_data.push({"timestamp": thisDate, "subreddit": thisSub, "value": 0})})});
+Dates.forEach(thisDate => { Subreddits.forEach(thisSub => { fill_data.push({ "timestamp": thisDate, "subreddit": thisSub, "value": 0 }) }) });
 
 heat_svg.selectAll(".sentiment_map")
     .data(fill_data)
     .enter()
     .append("rect")
     .attr("class", "sentiment_map")
-    .attr("x", function (d) { return x(d["timestamp"]) })
-    .attr("y", function (d) { return y(d["subreddit"]) })
-    .attr("width", x.bandwidth())
-    .attr("height", y.bandwidth())
+    .attr("x", function (d) { return heat_x(d["timestamp"]) })
+    .attr("y", function (d) { return heat_y(d["subreddit"]) })
+    .attr("width", heat_x.bandwidth())
+    .attr("height", heat_y.bandwidth())
     .style("opacity", 0.5)
-    .on("mouseover", function(event,d){
+    .on("mouseover", function (event, d) {
         console.log(d)
     })
 
@@ -79,15 +91,15 @@ function sentiment_heatmap(selectedGroup) {
                 overall_score += keyword_val[1].sentiment
             }
         });
-        rearranged_data[val.timestamp + ":" + val.source] = overall_score ;
+        rearranged_data[val.timestamp + ":" + val.source] = overall_score;
     });
     console.log(rearranged_data)
     heat_svg.selectAll(".sentiment_map")
         .transition()
         .duration(1000)
-        .style("fill", function (d) { 
-            if(rearranged_data[d.timestamp + ":" + d.subreddit] != null){
-                return heatMapColor(rearranged_data[d.timestamp + ":" + d.subreddit] );
+        .style("fill", function (d) {
+            if (rearranged_data[d.timestamp + ":" + d.subreddit] != null) {
+                return heatMapColor(rearranged_data[d.timestamp + ":" + d.subreddit]);
             } else {
                 return heatMapColor(d.value)
             }
