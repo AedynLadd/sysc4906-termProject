@@ -4,26 +4,51 @@
 <head>
   <title>SYSC 4906 Term Project</title>
   <link rel="stylesheet" href="dashboard/css/index.css">
+  <link rel="stylesheet" href="dashboard/css/sidebar.css">
+  <link rel="stylesheet" href="dashboard/css/header.css">
+  <link rel="stylesheet" href="dashboard/css/coin_info.css">
+  <link rel="stylesheet" href="dashboard/css/overview_info.css">
   <script src="https://d3js.org/d3.v6.js"></script>
 </head>
 
 <body>
-  <div id="dashboard_header" class="dashboard_header"> SYSC 4906 - CRYPTOCURRENCY SENTIMENT ANALYSIS </div>
+  <div id="dashboard_header" class="dashboard_header">
+    <div class="title_header courseCodeSYSC">SYSC</div>
+    <div class = "title_header courseCode4906">4906</div>
+    <div class="title_header Maintitle"> - CRYPTOCURRENCY SENTIMENT ANALYSIS</div>
+  </div>
+  <!-- DISPLAY CONTAINER -->
   <div id="main_body" class="grid-container">
-    <div class ="coin_select" id="coin_select"></div>
-    <div class ="coin_info">
+    <!-- LEFT COIN SELECTOR -->
+    <ul class="coin_select" id="coin_select">
+      <div class="coin_select_overview" onclick="update(null)"> Overview </div>
+      <input type="text" class="coinSearch" id="coinSearch" onkeyup="search_coin()" placeholder="Search.." title=" Enter a coin you want to learn more about">
+    </ul>
+    <!-- OVERVIEW INFO (RIGHT - OPT) -->
+    <div class = "overview_info" id = "overview_info_container">
+      <div class = "cyclic_coin_info" id = "cyclic_coin_info" ></div>
+      <div class = "keyword_network_diagram" id ="keyword_network_diagram"></div>
+      <div class = "network_diagram_data" id = "network_diagram_data"></div>
+    </div>
+    <!-- SPECIFIC COIN INFO (RIGHT - OPT)-->
+    <div class = "coin_info" id = "coin_info_container">
       <div class="coin_chart_data" id = "coin_chart_data"></div>
       <div class="coin_sentiment_heatmap" id="coin_sentiment_heatmap"></div>
+      <div class="additional_coin_info" id="additional_coin_info"></div>
     </div>
   </div>
 </body>
-<!--  DATA VARIABLES -->
+<!--  PAGE SCRIPT  -->
+<script type="text/javascript"> window.onresize = () => location.reload(); </script>
+<!--  DATA VARIABLES  -->
 <!--  Data variables need to be loaded in first, and then visualization scripts can be loaded to actually perform visualization tasks on them -->
 <script type="text/javascript" src="dashboard/data/historical_data.js"></script>
 <script type="text/javascript" src="dashboard/data/top_100_coins.js"></script>
 <script type="text/javascript" src="dashboard/data/reddit_summary.js"></script>
 <!--  VISUALIZATION SCRIPTS  -->
-<script type="text/javascript" src="dashboard/scripts/crypto_linechart.js"></script>
-<script type="text/javascript" src="dashboard/scripts/sentiment_heatmap.js"></script>
+<script type="text/javascript" src="dashboard/scripts/coin_info/crypto_linechart.js"></script>
+<script type="text/javascript" src="dashboard/scripts/coin_info/sentiment_heatmap.js"></script>
 <script type="text/javascript" src="dashboard/scripts/update_coin.js"></script>
+<!-- SUMMARY PAGE VISUALIZATIONS -->
+<script type="text/javascript" src="dashboard/scripts/overview_info/coin_summary.js"></script>
 </html>

@@ -1,0 +1,55 @@
+/* Top title Element */
+.coin_select_overview{
+    font-size: 30px;
+    color: rgb(44, 44, 44);
+    font-weight: 1000;
+    background-color: rgb(185, 185, 185);
+    padding-top: 5px;
+    border-top-left-radius: 1px;
+    border-top-right-radius: 1px;
+    border: solid 3px rgb(185, 185, 185);
+    text-align: center;
+    cursor: pointer;
+}
+
+/* Coin search box */
+.coinSearch{
+    position: relative;
+    background-color: rgb(185, 185, 185);
+    font-weight: 1000;
+    width: 100%;
+    height: 3%;
+    border: solid 3px rgb(185, 185, 185);
+}
+
+.coinSearch:focus{
+    outline: none;
+    box-shadow: none;
+}
+
+/* Each coin label */
+.coin_label {
+    font-size: 20px;
+    color: rgba(194, 194, 194, 0.445);
+    font-weight: bolder;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-left: 15px;
+}
+
+.coin_label:hover{
+    border-left: solid 2px rgba(255, 255, 255, 0.5);
+    color: rgba(194, 194, 194, 0.774);
+    cursor: pointer;
+}
+
+
+.coin_selected {
+    font-size: 28px;
+    color: rgb(255, 255, 255);
+    border-left: solid 5px rgb(185, 185, 185);
+    font-weight: bolder;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    padding-left: 20px;
+}

@@ -108,5 +108,5 @@ function sentiment_heatmap(selectedGroup) {
             } else {
                 return heatMapColor(d.value)
             }
-        });
+        })
 }

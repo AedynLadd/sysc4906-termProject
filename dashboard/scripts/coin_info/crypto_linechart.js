@@ -20,9 +20,9 @@ var allGroup = Object.keys(historical_coin_data)
 function create_coin_label(name_of_coin) {
     coin_name_ids = name_of_coin.split(" ").join("_")
     return [
-        "<div class='coin_label' id='coin_id_" + coin_name_ids + "' onclick=update('" + coin_name_ids + "')>",
-        name_of_coin,
-        "</div>"
+        "<li class='coin_label' id='coin_id_" + coin_name_ids + "' onclick=update('" + coin_name_ids + "')>",
+        "<a>", name_of_coin, "</a>",
+        "</li>"
     ]
 }
 
@@ -71,9 +71,12 @@ function update_graph(selectedGroup) {
 
     x_axis.call(d3.axisBottom(new_x).ticks(7).tickFormat(d => { return (new Date(d)).toLocaleDateString("en-CA") }));
 
+    let y_min = d3.min(historical_coin_data[selectedGroup]["open"], function (d) { return d })
+    let y_max = d3.max(historical_coin_data[selectedGroup]["open"], function (d) { return d })
+    let y_range = y_max - y_min
     // Add Y axis
     var new_y = d3.scaleLinear()
-        .domain([0, d3.max(historical_coin_data[selectedGroup]["open"], function (d) { return d })])
+        .domain([y_min - y_range*0.1, y_max + y_range*0.1])
         .range([line_height, 0]);
 
     y_axis.call(d3.axisLeft(new_y));
@@ -88,7 +91,7 @@ function update_graph(selectedGroup) {
         .attr("d", d3.area()
             .x(function (d) { return new_x(new Date(d.timestamp)) })
             .y1(function (d) { return new_y(+d.data) })
-            .y0(function (d) { return new_y(0) })
+            .y0(function (d) { return new_y(y_min - y_range*0.1) })
 
         )
         .attr("fill", "url(#areaGradient)")

@@ -1,0 +1,11 @@
+.coin_chart_data{
+    grid-area: 1 / 1 / 7 / 21;
+}
+
+.coin_sentiment_heatmap{
+    grid-area: 7 / 1 / 21 / 12;
+}
+
+.additional_coin_info{
+    grid-area: 7 / 12 / 21 / 21;
+}
