@@ -60,7 +60,7 @@ def keyword_search(input_text):
         if element in punc:
             input_text = input_text.replace(element, "")
 
-    input_text = input_text.split(" ")
+    input_text = input_text.lower().split(" ")
     return [term for term in terms if term in input_text]
 
 
