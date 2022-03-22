@@ -101,14 +101,13 @@
 /* CHORD GRAPH STYLE */
 
 .chord-link-Highlighted{
-    stroke: rgba(255, 255, 255, 0.4);
     fill: none;
     stroke-width: 5px;
 }
 
 .chord-link{
-    stroke: rgba(255, 255, 255, 0.03);
     fill: none;
+    opacity: 0;
 }
 
 

@@ -1,7 +1,7 @@
 var network_diagram_container = document.getElementById("keyword_network_diagram").getBoundingClientRect();
 
 // set the dimensions and margins of the graph
-const network_diagram = { top: 0, right: 30, bottom: 30, left: 60 },
+const network_diagram = { top: 0, right: 0, bottom: 30, left: 0 },
     network_width = network_diagram_container.width - network_diagram.left - network_diagram.right,
     network_height = network_diagram_container.height - network_diagram.top - network_diagram.bottom;
 
@@ -32,6 +32,7 @@ var x = d3.scalePoint()
     .range([0, network_width])
     .domain(allNodes)
 
+network_keyword_count
 
 function circlify(point) {
     var theta = (Math.PI / (network_width/2)) * x(point);
@@ -41,6 +42,9 @@ function circlify(point) {
     return [x_value, y_value]
 }
 
+var keyword_scale = d3.scaleLinear().range([0.4, 1]).domain([0, 100]); 
+var keyword_color_scale = d3.scaleSequential().interpolator(d3.interpolateMagma).domain([0, 100])
+
 // Initialize Network diagrams
 // Initialize the links
 const link = network_svg.append("g").attr("id", "network_diagram_g")
@@ -49,6 +53,7 @@ const link = network_svg.append("g").attr("id", "network_diagram_g")
     .data(network_data.links)
     .join("path")
     .attr("class", "networkGraph-link")
+    .style("opacity", a => { return keyword_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 :  network_keyword_count[a.source.name][a.target.name])});
 
 // Initialize the nodes
 const node = network_svg.append("g").attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
@@ -68,12 +73,33 @@ node.call(d3.drag()
         // Highlight the node
         if (isChord) {
             // Highlight the links
-            link.attr("class", a => a.source.id === d.id || a.target.id === d.id && selected_node != null ? 'chord-link-Highlighted' : 'chord-link');
+            link.attr("class", a => {
+                    if(selected_node == null){
+                        return 'chord-link'
+                    }
+                    else {
+                        return a.source.id === d.id || a.target.id === d.id ? 'chord-link-Highlighted' : 'chord-link'
+                    }
+                })
+                .style("opacity", a => {
+                    if(selected_node == null){
+                        return 0.1;
+                    } else {
+                        return a.source.id === d.id || a.target.id === d.id ? 0.8 : 0.1;
+                    }
+                });;
+
             node.attr('class', a => a.id === d.id && selected_node != null ? 'networkGraph-node-Highlighted' : "networkGraph-node")
         } else {
             node.attr('class', a => a.id === d.id && selected_node != null ? 'networkGraph-node-Highlighted' : "networkGraph-node")
             // Highlight the links
-            link.attr("class", a => a.source.id === d.id || a.target.id === d.id && selected_node != null ? 'networkGraph-link-Highlighted' : 'networkGraph-link');
+            link.attr("class", a => {
+                if(selected_node == null){
+                    return 'networkGraph-link'
+                } else {
+                    return a.source.id === d.id || a.target.id === d.id ? 'networkGraph-link-Highlighted' : 'networkGraph-link';
+                }
+            }).style("opacity", a => { return keyword_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 :  network_keyword_count[a.source.name][a.target.name])})
         }
 
         if(selected_node != null){
@@ -106,13 +132,17 @@ node.call(d3.drag()
                 .duration(200)
                 .attr("d", d => ["M", circlify(d.source.name)[0], circlify(d.source.name)[1],  // M P1X P1Y
                     "Q", 0, 0, // Q C1X C1Y
-                    circlify(d.target.name)[0], circlify(d.target.name)[1]].join(" ")); // P2X P2Y
+                    circlify(d.target.name)[0], circlify(d.target.name)[1]].join(" ")) // P2X P2Y
+                .style("stroke", a => { return keyword_color_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 :  network_keyword_count[a.source.name][a.target.name])})
+                .style("opacity", a => a.source.id === d.id || a.target.id === d.id ? 0.8 : 0.1);
         } else {
             simulation.restart();
             // Network highlighting
             node.attr('class', a => a.id === d.id ? 'networkGraph-node-Highlighted' : "networkGraph-node")
             // Highlight the links
-            link.attr("class", a => a.source.id === d.id || a.target.id === d.id ? 'networkGraph-link-Highlighted' : 'networkGraph-link');
+            link.attr("class", a => a.source.id === d.id || a.target.id === d.id ? 'networkGraph-link-Highlighted' : 'networkGraph-link')
+            .style("stroke", null)
+            .style("opacity", a => { return keyword_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 :  network_keyword_count[a.source.name][a.target.name])});
         }
 
     });
