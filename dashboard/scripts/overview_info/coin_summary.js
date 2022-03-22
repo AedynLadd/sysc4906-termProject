@@ -79,7 +79,7 @@ function update_coin_summary_graph(i, coin_id) {
         .datum(rearrangedData)
         .transition()
         .duration(1000)
-        .attr("d", d3.line().x(function (d) { return new_x(new Date(d.timestamp)) }).y(function (d) { return new_y(+d.data) }))
+        .attr("d", d3.line().curve(d3.curveBasis).x(function (d) { return new_x(new Date(d.timestamp)) }).y(function (d) { return new_y(+d.data) }))
         .attr("stroke", function (d) { return myColor(selectedCoin) })
         .attr("stroke-width", "3px")
         .attr("fill", "none")
