@@ -1,12 +1,12 @@
 var network_diagram_container = document.getElementById("keyword_network_diagram").getBoundingClientRect();
 
 // set the dimensions and margins of the graph
-const network_diagram = { top: 10, right: 30, bottom: 30, left: 60 },
+const network_diagram = { top: 0, right: 30, bottom: 30, left: 60 },
     network_width = network_diagram_container.width - network_diagram.left - network_diagram.right,
     network_height = network_diagram_container.height - network_diagram.top - network_diagram.bottom;
 
 var isChord = false;
-
+var selected_node = null;
 const network_svg = d3.select("#keyword_network_diagram")
     .append("svg")
     .attr("width", "100%")
@@ -28,16 +28,14 @@ var allNodes = network_data.nodes.map(function (d) { return d.name })
 var idToNode = {};
 network_data.nodes.forEach(n => idToNode[n.id] = n);
 
-console.log(allNodes)
 var x = d3.scalePoint()
     .range([0, network_width])
     .domain(allNodes)
 
 
 function circlify(point) {
-    console.log(x(point))
-    var theta = (Math.PI / (network_height / 2)) * x(point);
-    var radius = (network_height / 2) * 0.95
+    var theta = (Math.PI / (network_width/2)) * x(point);
+    var radius = (network_height / 2) * 0.90
     var y_value = radius * Math.sin(theta)
     var x_value = radius * Math.cos(theta)
     return [x_value, y_value]
@@ -66,19 +64,30 @@ node.call(d3.drag()
     .on("drag", dragged)
     .on("end", drag_ended))
     .on('click', function (event, d) {
+        selected_node = selected_node == d.id ? null : d.id;
         // Highlight the node
         if (isChord) {
             // Highlight the links
-            link.attr("class", a => a.source.id === d.id || a.target.id === d.id ? 'chord-link-Highlighted' : 'chord-link');
-            node.attr('class', a => a.id === d.id ? 'networkGraph-node-Highlighted' : "networkGraph-node")
+            link.attr("class", a => a.source.id === d.id || a.target.id === d.id && selected_node != null ? 'chord-link-Highlighted' : 'chord-link');
+            node.attr('class', a => a.id === d.id && selected_node != null ? 'networkGraph-node-Highlighted' : "networkGraph-node")
         } else {
-            node.attr('class', a => a.id === d.id ? 'networkGraph-node-Highlighted' : "networkGraph-node")
+            node.attr('class', a => a.id === d.id && selected_node != null ? 'networkGraph-node-Highlighted' : "networkGraph-node")
             // Highlight the links
-            link.attr("class", a => a.source.id === d.id || a.target.id === d.id ? 'networkGraph-link-Highlighted' : 'networkGraph-link');
+            link.attr("class", a => a.source.id === d.id || a.target.id === d.id && selected_node != null ? 'networkGraph-link-Highlighted' : 'networkGraph-link');
         }
+
+        if(selected_node != null){
+            // hide the menu and expand the grid
+            console.log("showing menu")
+        } else {
+            // show the menu
+            console.log("hiding menu")
+        }
+
     })
     .on('dblclick', function (event, d) {
         isChord = (isChord) ? false : true;
+        selected_node = selected_node == d.id ? null : d.id;
         if (isChord) {
             simulation.stop()
             //Highlight the selected!

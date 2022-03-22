@@ -104,14 +104,15 @@ def create_network_formatted_data():
             "id": id,
             "name": node
         })
-        
+        node_count_list[node] = {}
         link_df = pd.DataFrame(node_links[node])
         count_df = pd.DataFrame(link_df.value_counts())
         for element, count in count_df.iterrows():
-            node_count_list[node] = {"name": str(element[0]), "count": int(count)}
-            end_id = list(unique_nodes).index(element[0]) + 1
 
+            node_count_list[node][str(element[0])] = int(count)
+            end_id = list(unique_nodes).index(element[0]) + 1
             if(id != end_id and int(count) >= 5):
+                
                 OurLinks.append({
                     "source": id,
                     "target": end_id,
@@ -127,7 +128,6 @@ def create_network_formatted_data():
         new_f = open("{}/dashboard/data/keyword_network_data.js".format(project_dir), "x")
         new_f.write("const network_data = {}".format(data))
 
-    print(node_count_list)
     try:
         new_f = open("{}/dashboard/data/keyword_count_data.js".format(project_dir), "w")
         new_f.write("const network_keyword_count = {}".format(node_count_list))
