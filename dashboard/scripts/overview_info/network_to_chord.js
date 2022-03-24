@@ -1,15 +1,17 @@
-var network_diagram_container = document.getElementById("keyword_network_diagram").getBoundingClientRect();
-
 var coin_map_to_slug = new Object()
 top_100_coins.forEach(coin => coin_map_to_slug[coin.slug] = { "name": coin.name, "slug": coin.slug, "symbol": coin.symbol });
 
+
+var network_diagram_container = document.getElementById("keyword_network_diagram").getBoundingClientRect();
+
 // set the dimensions and margins of the graph
 const network_diagram = { top: 0, right: 0, bottom: 30, left: 0 },
-    network_width = network_diagram_container.width - network_diagram.left - network_diagram.right,
-    network_height = network_diagram_container.height - network_diagram.top - network_diagram.bottom;
+      network_width = network_diagram_container.width - network_diagram.left - network_diagram.right,
+      network_height = network_diagram_container.height - network_diagram.top - network_diagram.bottom;
 
 var isChord = false;
 var selected_node = null;
+
 const network_svg = d3.select("#keyword_network_diagram")
     .append("svg")
     .attr("width", "100%")
@@ -71,7 +73,7 @@ const node = graphNodeEnter.attr("transform", "translate(" + network_width / 2 +
 const nodeLabel = graphNodeEnter.attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
     .append("text")
     .attr("dx", d => { return -20 })
-    .text(d => { 
+    .text(d => {
         try {
             return coin_map_to_slug[d.name.toLowerCase()].symbol
         } catch {
@@ -86,7 +88,7 @@ node.call(d3.drag()
     .on("drag", dragged)
     .on("end", drag_ended))
     .on('click', function (event, d) {
-        selected_node = selected_node == d.id ? null : d;
+        selected_node = selected_node == d.id ? null : d.id;
         display_coin_info(selected_node == null ? null : d)
         // Highlight the node
         if (isChord) {

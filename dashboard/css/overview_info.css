@@ -132,8 +132,19 @@
     width: 100%;
     height: 100%;
     display: grid;
-    grid-template-columns: repeat(5, 20%);
-    grid-template-rows: repeat(5, 20%);
+    grid-template-columns: repeat(10, 10%);
+    grid-template-rows: repeat(10, 10%);
     border-radius: 15px;
     padding-top: 10px;
 }
+.additional_coin_info_box_title{ 
+    grid-area: 1 / 1 / 1 / 11;
+    font-size: 30px;
+    font-weight: bolder;
+    text-align: center;
+    align-items: center;
+}
+
+.additional_coin_info_box_substats{ grid-area: 2 / 1 / 4 / 11; }
+
+.coin_joyplots{ grid-area: 4 / 1 / 11 / 11; }
