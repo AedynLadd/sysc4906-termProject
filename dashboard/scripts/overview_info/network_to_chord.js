@@ -1,5 +1,8 @@
 var network_diagram_container = document.getElementById("keyword_network_diagram").getBoundingClientRect();
 
+var coin_map_to_slug = new Object()
+top_100_coins.forEach(coin => coin_map_to_slug[coin.slug] = { "name": coin.name, "slug": coin.slug, "symbol": coin.symbol });
+
 // set the dimensions and margins of the graph
 const network_diagram = { top: 0, right: 0, bottom: 30, left: 0 },
     network_width = network_diagram_container.width - network_diagram.left - network_diagram.right,
@@ -20,7 +23,7 @@ const simulation = d3.forceSimulation(network_data.nodes)
     )
     .force("charge", d3.forceManyBody().strength(-200))
     .force("x", d3.forceX(0))
-    .force("y", d3.forceY(0))
+    .force("y", d3.forceY(-50))
     .force("collide", d3.forceCollide(d => 30))
 
 var allNodes = network_data.nodes.map(function (d) { return d.name })
@@ -32,17 +35,15 @@ var x = d3.scalePoint()
     .range([0, network_width])
     .domain(allNodes)
 
-network_keyword_count
-
 function circlify(point) {
-    var theta = (Math.PI / (network_width/2)) * x(point);
+    var theta = (Math.PI / (network_width / 2)) * x(point);
     var radius = (network_height / 2) * 0.90
     var y_value = radius * Math.sin(theta)
     var x_value = radius * Math.cos(theta)
     return [x_value, y_value]
 }
 
-var keyword_scale = d3.scaleLinear().range([0.4, 1]).domain([0, 100]); 
+var keyword_scale = d3.scaleLinear().range([0.4, 1]).domain([0, 100]);
 var keyword_color_scale = d3.scaleSequential().interpolator(d3.interpolateMagma).domain([0, 100])
 
 // Initialize Network diagrams
@@ -53,15 +54,31 @@ const link = network_svg.append("g").attr("id", "network_diagram_g")
     .data(network_data.links)
     .join("path")
     .attr("class", "networkGraph-link")
-    .style("opacity", a => { return keyword_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 :  network_keyword_count[a.source.name][a.target.name])});
+    .style("opacity", a => { return keyword_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 : network_keyword_count[a.source.name][a.target.name]) });
 
-// Initialize the nodes
-const node = network_svg.append("g").attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
-    .selectAll("circle")
+var graphNodes = network_svg.selectAll("g graphNodes")
     .data(network_data.nodes)
-    .join("circle")
+
+/*Create and place the "blocks" containing the circle and the text */
+graphNodeEnter = graphNodes.enter()
+    .append("g")
+
+const node = graphNodeEnter.attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
+    .append("circle")
     .attr("r", 10)
     .attr("class", "networkGraph-node")
+
+const nodeLabel = graphNodeEnter.attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
+    .append("text")
+    .attr("dx", d => { return -20 })
+    .text(d => { 
+        try {
+            return coin_map_to_slug[d.name.toLowerCase()].symbol
+        } catch {
+            return d.name
+        }
+    })
+    .attr("class", "networkGraph-node-label")
 
 // Add interactions
 node.call(d3.drag()
@@ -69,20 +86,21 @@ node.call(d3.drag()
     .on("drag", dragged)
     .on("end", drag_ended))
     .on('click', function (event, d) {
-        selected_node = selected_node == d.id ? null : d.id;
+        selected_node = selected_node == d.id ? null : d;
+        display_coin_info(selected_node == null ? null : d)
         // Highlight the node
         if (isChord) {
             // Highlight the links
             link.attr("class", a => {
-                    if(selected_node == null){
-                        return 'chord-link'
-                    }
-                    else {
-                        return a.source.id === d.id || a.target.id === d.id ? 'chord-link-Highlighted' : 'chord-link'
-                    }
-                })
+                if (selected_node == null) {
+                    return 'chord-link'
+                }
+                else {
+                    return a.source.id === d.id || a.target.id === d.id ? 'chord-link-Highlighted' : 'chord-link'
+                }
+            })
                 .style("opacity", a => {
-                    if(selected_node == null){
+                    if (selected_node == null) {
                         return 0.1;
                     } else {
                         return a.source.id === d.id || a.target.id === d.id ? 0.8 : 0.1;
@@ -94,26 +112,19 @@ node.call(d3.drag()
             node.attr('class', a => a.id === d.id && selected_node != null ? 'networkGraph-node-Highlighted' : "networkGraph-node")
             // Highlight the links
             link.attr("class", a => {
-                if(selected_node == null){
+                if (selected_node == null) {
                     return 'networkGraph-link'
                 } else {
                     return a.source.id === d.id || a.target.id === d.id ? 'networkGraph-link-Highlighted' : 'networkGraph-link';
                 }
-            }).style("opacity", a => { return keyword_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 :  network_keyword_count[a.source.name][a.target.name])})
+            }).style("opacity", a => { return keyword_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 : network_keyword_count[a.source.name][a.target.name]) })
         }
-
-        if(selected_node != null){
-            // hide the menu and expand the grid
-            console.log("showing menu")
-        } else {
-            // show the menu
-            console.log("hiding menu")
-        }
-
     })
     .on('dblclick', function (event, d) {
         isChord = (isChord) ? false : true;
         selected_node = selected_node == d.id ? null : d.id;
+
+        display_coin_info(selected_node == null ? null : d)
         if (isChord) {
             simulation.stop()
             //Highlight the selected!
@@ -127,13 +138,21 @@ node.call(d3.drag()
                     return "translate(" + coords[0] + "," + coords[1] + ")"
                 });
 
+            nodeLabel.transition()
+                .duration(100)
+                .attr("class", 'chord-node-label')
+                .attr("transform", function (d) {
+                    coords = circlify(d.name);
+                    return "translate(" + coords[0] + "," + coords[1] + ")"
+                });
+
             link
                 .transition()
                 .duration(200)
                 .attr("d", d => ["M", circlify(d.source.name)[0], circlify(d.source.name)[1],  // M P1X P1Y
                     "Q", 0, 0, // Q C1X C1Y
                     circlify(d.target.name)[0], circlify(d.target.name)[1]].join(" ")) // P2X P2Y
-                .style("stroke", a => { return keyword_color_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 :  network_keyword_count[a.source.name][a.target.name])})
+                .style("stroke", a => { return keyword_color_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 : network_keyword_count[a.source.name][a.target.name]) })
                 .style("opacity", a => a.source.id === d.id || a.target.id === d.id ? 0.8 : 0.1);
         } else {
             simulation.restart();
@@ -141,8 +160,9 @@ node.call(d3.drag()
             node.attr('class', a => a.id === d.id ? 'networkGraph-node-Highlighted' : "networkGraph-node")
             // Highlight the links
             link.attr("class", a => a.source.id === d.id || a.target.id === d.id ? 'networkGraph-link-Highlighted' : 'networkGraph-link')
-            .style("stroke", null)
-            .style("opacity", a => { return keyword_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 :  network_keyword_count[a.source.name][a.target.name])});
+                .style("stroke", null)
+                .style("opacity", a => { return keyword_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 : network_keyword_count[a.source.name][a.target.name]) });
+            nodeLabel.attr('class', 'networkGraph-node-label')
         }
 
     });
@@ -183,6 +203,11 @@ function ticked(transition_duration = 50) {
         .duration(transition_duration)
         .attr("transform", function (d) {
             return "translate(" + validate_point(d.x, network_width) + "," + validate_point(d.y, network_height) + ")";
+        })
+    nodeLabel.transition()
+        .duration(transition_duration)
+        .attr("transform", function (d) {
+            return "translate(" + validate_point(d.x, network_width) + "," + validate_point(d.y, network_height - 15) + ")";
         })
 
 }

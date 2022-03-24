@@ -14,14 +14,6 @@ function create_coin_summary(id) {
     ]
 }
 
-function test(test){
-    console.log("TESTING: " + test)
-}
-function populate_line_chart(name_of_coin, coin_summary_id) {
-    var this_coin_data = historical_coin_data[name_of_coin].open.map(function (d, i) { return { "data": d, "timestamp": historical_coin_data[allGroup[0]].timestamp[i] }; });
-
-}
-
 var last_display_index = 0;
 var line_chart_ref = []
 

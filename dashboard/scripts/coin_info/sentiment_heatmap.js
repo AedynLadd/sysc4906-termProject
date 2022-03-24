@@ -3,8 +3,7 @@
 ////
 // Rearrange our top coin data so that its usefull to us
 var coin_map_to_name = new Object()
-top_100_coins.forEach(coin => coin_map_to_name[coin.name] = { "name": coin.name, "slug": coin.slug, "symbol": coin.symbol });
-
+top_100_coins.forEach(coin => coin_map_to_name[coin.name.toLowerCase()] = { "name": coin.name, "slug": coin.slug, "symbol": coin.symbol });
 
 ////
 // CONTAINER
@@ -86,7 +85,7 @@ heat_svg.selectAll(".sentiment_map")
 function sentiment_heatmap(selectedGroup) {
     selectedGroup = selectedGroup.split("_").join(" ")
 
-    var keywords_of_interest = Object.values(coin_map_to_name[selectedGroup])
+    var keywords_of_interest = Object.values(coin_map_to_name[selectedGroup.toLowerCase()])
 
     var rearranged_data = new Object();
     Object.values(reddit_summary).forEach(val => {

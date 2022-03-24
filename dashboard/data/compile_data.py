@@ -6,6 +6,8 @@ import logging
 from sqlite3 import Row
 import pandas as pd
 from pathlib import Path
+import networkx as nx
+
 
 logger = logging.getLogger("Dashboard compiler")
 
@@ -98,6 +100,7 @@ def create_network_formatted_data():
     OurLinks = []
     id = 0
     node_count_list = {}
+    G = nx.Graph()
     for node in unique_nodes:
         id += 1
         OurNodes.append({
@@ -112,12 +115,35 @@ def create_network_formatted_data():
             node_count_list[node][str(element[0])] = int(count)
             end_id = list(unique_nodes).index(element[0]) + 1
             if(id != end_id and int(count) >= 5):
+                G.add_edge(id, end_id)
                 
                 OurLinks.append({
                     "source": id,
                     "target": end_id,
                     "value": int(count)
                 })
+
+    degree_centrality = nx.degree_centrality(G)
+    
+    betweeness_centrality = nx.betweenness_centrality(G, normalized=False)
+
+    betweeness_centrality_normalized = nx.betweenness_centrality(G)
+
+    def validate_ref(id, ref_dict):
+        try: 
+            return ref_dict[int(id)]
+        except Exception as e:
+            return 0
+        
+    OurNodes = [{"id": ThisNode["id"],
+                 "name": ThisNode["name"], 
+                 "data": {
+                        "degree":  validate_ref(ThisNode["id"], degree_centrality),
+                        "betweeness":  validate_ref(ThisNode["id"], betweeness_centrality),
+                        "normalized_betweeness": validate_ref(ThisNode["id"], betweeness_centrality_normalized)
+                    }   
+                } for ThisNode in OurNodes ]
+
 
     data = {"nodes": OurNodes, "links": OurLinks}
 
@@ -134,7 +160,7 @@ def create_network_formatted_data():
     except:
         new_f = open("{}/dashboard/data/keyword_count_data.js".format(project_dir), "x")
         new_f.write("const network_keyword_count = {}".format(node_count_list))
-        
+
     return 200
 
 
