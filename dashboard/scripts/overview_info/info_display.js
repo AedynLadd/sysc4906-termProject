@@ -11,7 +11,7 @@ const coin_joyplot_svg = d3.select("#coin_joyplots")
     .attr("height", "100%")
     .append("g")
 
-
+coin_joyplot_svg.selectAll("areas")
 
 
 function display_coin_info(coin_data){

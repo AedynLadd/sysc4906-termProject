@@ -9,3 +9,13 @@
 .additional_coin_info{
     grid-area: 7 / 12 / 21 / 21;
 }
+
+.zoom{
+    cursor: move;
+    fill: none; 
+    pointer-events: all;
+}
+
+.selection{
+    fill: rgba(88, 88, 88, 0.705);
+}
