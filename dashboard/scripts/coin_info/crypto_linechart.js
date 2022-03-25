@@ -206,6 +206,7 @@ function update_graph(selectedGroup) {
     
     line_brush.on("brush end", brushed);
     function brushed(event) {
+        console.log("this event here?")
         if (event.sourceEvent == undefined) return; // ignore brush-by-zoom
         var s = event.selection || x2.range();
         new_x.domain(s.map(x2.invert, x2));
@@ -234,8 +235,7 @@ function update_graph(selectedGroup) {
 
     zoom.on("zoom", zoomed);
     function zoomed(event) {
-        console.log(event)
-        if (event.sourceEvent == undefined || event.sourceEvent.type != "wheel") return; // ignore zoom-by-brush
+        if (event.sourceEvent == undefined || (event.sourceEvent.type == "wheel" || event.sourceEvent.type == "mousemove") != true) return; // ignore zoom-by-brush
         
         var t = event.transform;
         new_x.domain(t.rescaleX(x2).domain());
