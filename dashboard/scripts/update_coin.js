@@ -36,11 +36,11 @@ function update(selectedCoin) {
         display_specific_coin.style.display = "none";
         display_coins_overview.style.display = "grid";
     } else {
-        console.log("displaying a specific coin")
         display_coins_overview.style.display = "none";
         display_specific_coin.style.display = "grid";
-        update_graph(selectedCoin)
-        sentiment_heatmap(selectedCoin)
+        sentiment_heatmap(selectedCoin);
+        update_graph(selectedCoin);
+        
     }
 
 

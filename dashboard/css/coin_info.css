@@ -17,5 +17,9 @@
 }
 
 .selection{
-    fill: rgba(88, 88, 88, 0.705);
+    fill: rgba(88, 88, 88, 0.7);
+}
+
+.selection:hover{
+    fill: rgba(88, 88, 88, 0.9);
 }

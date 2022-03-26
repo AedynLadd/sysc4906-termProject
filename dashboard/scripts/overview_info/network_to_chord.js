@@ -67,12 +67,12 @@ graphNodeEnter = graphNodes.enter()
 
 const node = graphNodeEnter.attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
     .append("circle")
-    .attr("r", 10)
+    .attr("r", 9)
     .attr("class", "networkGraph-node")
 
 const nodeLabel = graphNodeEnter.attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
     .append("text")
-    .attr("dx", d => { return -20 })
+    .attr("dx", d => { return -10 })
     .text(d => {
         try {
             return coin_map_to_slug[d.name.toLowerCase()].symbol

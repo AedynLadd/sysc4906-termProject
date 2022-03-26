@@ -55,9 +55,14 @@ var rearrangedData = historical_coin_data[allGroup[0]].open.map(function (d, i) 
 //
 var focus = line_svg.append("g")
     .attr("class", "focus")
+    .attr("id", "cryptoLinechartFocus")
 
 var context = line_svg.append("g")
     .attr("class", "context")
+
+var sentiment_line = focus
+    .append('g')
+    .append("path");
 
 var line = focus   // top line def
     .append('g')
@@ -116,7 +121,6 @@ var zoom_rect = line_svg.append("rect")
     .attr("width", line_width)
     .attr("height", line_height)
     .call(zoom);
-
 
 //
 // THIS FUNCTION UPDATES THE DATA AND THE CHART
@@ -178,6 +182,7 @@ function update_graph(selectedGroup) {
         .attr("stroke", function (d) { return myColor(selectedGroup) })
         .attr("stroke-width", "3px")
         .attr("fill", "none")
+        .style("filter", "drop-shadow(0px 0px 5px " + myColor(selectedGroup) + ")");
 
     area_top_col.transition()
         .duration(1000)
@@ -191,6 +196,7 @@ function update_graph(selectedGroup) {
         .attr("stop-opacity", 0);
 
     // Add the line number 2 data this shows all time as opposed to brushed area
+    console.log(rearrangedData)
     line_2.datum(rearrangedData)
         .transition()
         .duration(1000)
@@ -201,12 +207,44 @@ function update_graph(selectedGroup) {
         .attr("stroke", function (d) { return myColor(selectedGroup) })
         .attr("stroke-width", "1px")
         .attr("fill", "none")
+
+
+    // Creation of the sentiment line
+    sentiment_line_data_format = []
     
+    var sentiment_min = null;
+    var sentiment_max = null;
+
+    Object.keys(day_summary_data).forEach(function(key){ 
+        if (new_x(key) <= 0) return;
+        sentiment_max = sentiment_max == null ? day_summary_data[key] : (sentiment_max < day_summary_data[key] ? day_summary_data[key] : sentiment_max);
+        sentiment_min = sentiment_min == null ? day_summary_data[key] : (sentiment_min > day_summary_data[key] ? day_summary_data[key] : sentiment_min);
+        sentiment_line_data_format.push({"timestamp": key, "data": day_summary_data[key]});
+    })
+
+    var sentiment_range = Math.abs(sentiment_min - sentiment_max);
+
+    var sentiment_y = d3.scaleLinear()
+        .domain([sentiment_min - sentiment_range * 0.1, (sentiment_min == sentiment_max & sentiment_max == 0) ? 1 : sentiment_max + sentiment_range * 0.1])
+        .range([line_height, 0]);
+
+    sentiment_line.datum(sentiment_line_data_format)
+        .transition()
+        .duration(1000)
+        .attr("d", d3.line().curve(d3.curveBundle)
+            .x(function (d) { return new_x(d.timestamp) })
+            .y(function (d) { return sentiment_y(d.data)})
+        )
+        .attr("stroke", "white")
+        .attr("stroke-width", "3px")
+        .style("opacity", 0.3)
+        .attr("fill", "none")
+        .style("filter", "drop-shadow(0px 0px 5px black)");
+    
+    // Brushed and zoom events
     brush_callback.call(line_brush.move, new_x.range());
     
-    line_brush.on("brush end", brushed);
-    function brushed(event) {
-        console.log("this event here?")
+    brushed = (event) => {
         if (event.sourceEvent == undefined) return; // ignore brush-by-zoom
         var s = event.selection || x2.range();
         new_x.domain(s.map(x2.invert, x2));
@@ -215,7 +253,7 @@ function update_graph(selectedGroup) {
             .attr("d", d3.line()
                 .x(function (d) { return new_x(new Date(d.timestamp)) })
                 .y(function (d) { return new_y(+d.data) })
-            )
+            );
         
         area
             .datum(rearrangedData)
@@ -223,7 +261,14 @@ function update_graph(selectedGroup) {
                 .x(function (d) { return new_x(new Date(d.timestamp)) })
                 .y1(function (d) { return new_y(+d.data) })
                 .y0(function (d) { return new_y(y_min - y_range * 0.1) })
-            )
+            );
+
+        sentiment_line
+            .datum(sentiment_line_data_format)
+            .attr("d", d3.line().curve(d3.curveBundle)
+                .x(function (d) { return new_x(d.timestamp) })
+                .y(function (d) { return sentiment_y(d.data)})
+            );
 
         focus.select(".line_axis_x").call(d3.axisBottom(new_x).ticks(7).tickFormat(d => { return (new Date(d)).toLocaleDateString("en-CA") }));
 
@@ -232,9 +277,8 @@ function update_graph(selectedGroup) {
                 .translate(-s[0], 0));
     }
     
-
-    zoom.on("zoom", zoomed);
-    function zoomed(event) {
+    zoomed = (event) => {
+        console.log("running?")
         if (event.sourceEvent == undefined || (event.sourceEvent.type == "wheel" || event.sourceEvent.type == "mousemove") != true) return; // ignore zoom-by-brush
         
         var t = event.transform;
@@ -244,7 +288,7 @@ function update_graph(selectedGroup) {
             .attr("d", d3.line()
                 .x(function (d) { return new_x(new Date(d.timestamp)) })
                 .y(function (d) { return new_y(+d.data) })
-            )
+            );
         
         area
             .datum(rearrangedData)
@@ -252,10 +296,20 @@ function update_graph(selectedGroup) {
                 .x(function (d) { return new_x(new Date(d.timestamp)) })
                 .y1(function (d) { return new_y(+d.data) })
                 .y0(function (d) { return new_y(y_min - y_range * 0.1) })
-            )
+            );
+
+        sentiment_line
+            .datum(sentiment_line_data_format)
+            .attr("d", d3.line().curve(d3.curveBundle)
+                .x(function (d) { return new_x(d.timestamp) })
+                .y(function (d) { return sentiment_y(d.data)})
+            );
         focus.select(".axis--x").call(d3.axisBottom(new_x));
         context.select(".brush").call(line_brush.move, new_x.range().map(t.invertX, t));
     }
+
+    zoom.on("zoom", zoomed);
+    line_brush.on("brush end", brushed);
 }
 
   

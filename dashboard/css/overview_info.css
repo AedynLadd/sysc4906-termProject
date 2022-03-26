@@ -82,7 +82,7 @@
 .networkGraph-link-Highlighted{
     fill: none;
     stroke: rgba(255, 255, 255, 0.3);
-    stroke-width: 3px;
+    stroke-width: 4px;
 }
 
 .networkGraph-node{

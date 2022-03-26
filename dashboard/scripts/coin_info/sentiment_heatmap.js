@@ -76,17 +76,17 @@ heat_svg.selectAll(".sentiment_map")
     .attr("y", function (d) { return heat_y(d["subreddit"]) })
     .attr("width", heat_x.bandwidth())
     .attr("height", heat_y.bandwidth())
-    .style("opacity", 0.5)
-    .on("mouseover", function (event, d) {
-        console.log(d)
-    })
+    .style("opacity", 0.5);
 
+
+day_summary_data = new Object();
 
 function sentiment_heatmap(selectedGroup) {
     selectedGroup = selectedGroup.split("_").join(" ")
 
     var keywords_of_interest = Object.values(coin_map_to_name[selectedGroup.toLowerCase()])
 
+    day_summary_data = new Object();
     var rearranged_data = new Object();
     Object.values(reddit_summary).forEach(val => {
         let overall_score = 0;
@@ -96,8 +96,9 @@ function sentiment_heatmap(selectedGroup) {
             }
         });
         rearranged_data[val.timestamp + ":" + val.source] = overall_score;
+        day_summary_data[val.timestamp] = day_summary_data[val.timestamp] == null ? overall_score : (day_summary_data[val.timestamp]+overall_score);
     });
-    console.log(rearranged_data)
+
     heat_svg.selectAll(".sentiment_map")
         .transition()
         .duration(1000)
@@ -107,5 +108,8 @@ function sentiment_heatmap(selectedGroup) {
             } else {
                 return heatMapColor(d.value)
             }
-        })
+        });
 }
+
+
+

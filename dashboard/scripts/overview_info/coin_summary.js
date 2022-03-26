@@ -75,6 +75,7 @@ function update_coin_summary_graph(i, coin_id) {
         .attr("stroke", function (d) { return myColor(selectedCoin) })
         .attr("stroke-width", "3px")
         .attr("fill", "none")
+        .style("filter","drop-shadow(0px 0px 3px " + myColor(selectedCoin) + ")");
 }
 
 
