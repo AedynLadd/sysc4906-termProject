@@ -4,7 +4,7 @@ var line_chart_container = document.getElementById("coin_chart_data").getBoundin
 // set the dimensions and margins of the graph
 const line_margin = {top: 20, right: 20, bottom: line_chart_container.height*0.5, left: 40},
     margin2 = {top: line_chart_container.height*0.6, right: 20, bottom: line_chart_container.height*0.01, left: 40},
-    line_width = line_chart_container.width - line_margin.left - line_margin.right,
+    line_width = (line_chart_container.width - line_margin.left - line_margin.right)*0.99,
     line_height = line_chart_container.height - line_margin.top - line_margin.bottom,
     full_scope_height = line_chart_container.height - margin2.top - margin2.bottom;
 
@@ -81,10 +81,16 @@ var line_2 = context // bottom line def
 // AXIS DEFINITIONS
 //
 // top chart
-var line_x_axis = focus.append("g").attr("class", "line_axis_x")
-.attr("transform", "translate(0," + line_height + ")")
+var line_x_axis = focus.append("g")
+    .attr("class", "line_axis_x")
+    .attr("transform", "translate(0," + line_height + ")")
 
-var line_y_axis = focus.append("g").attr("class", "line_axis_y")
+var line_y_axis = focus.append("g")
+    .attr("class", "line_axis_y")
+
+var sentiment_line_y_axis = focus.append("g")
+    .attr("class", "sentiment_line_axis_y")
+    .attr("transform", "translate(" + line_width + ",0)");
 
 // bottom chart
 var line_scope_x_axis = context.append("g").attr("class", "line_scope_axis_x")
@@ -135,7 +141,6 @@ function update_graph(selectedGroup) {
     var x2 = d3.scaleLinear()
         .domain(new_x.domain())
         .range([0, line_width])
-    
     
     line_x_axis.call(d3.axisBottom(new_x).ticks(7).tickFormat(d => { return (new Date(d)).toLocaleDateString("en-CA") }));
     line_scope_x_axis.call(d3.axisBottom(new_x).ticks(7).tickFormat(d => { return (new Date(d)).toLocaleDateString("en-CA") }));
@@ -241,6 +246,8 @@ function update_graph(selectedGroup) {
         .attr("fill", "none")
         .style("filter", "drop-shadow(0px 0px 5px black)");
     
+    sentiment_line_y_axis.call(d3.axisRight(sentiment_y).ticks(5));
+
     // Brushed and zoom events
     brush_callback.call(line_brush.move, new_x.range());
     
