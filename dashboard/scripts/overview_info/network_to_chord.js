@@ -1,13 +1,12 @@
 var coin_map_to_slug = new Object()
 top_100_coins.forEach(coin => coin_map_to_slug[coin.slug] = { "name": coin.name, "slug": coin.slug, "symbol": coin.symbol });
 
-
 var network_diagram_container = document.getElementById("keyword_network_diagram").getBoundingClientRect();
 
 // set the dimensions and margins of the graph
 const network_diagram = { top: 0, right: 0, bottom: 30, left: 0 },
-      network_width = network_diagram_container.width - network_diagram.left - network_diagram.right,
-      network_height = network_diagram_container.height - network_diagram.top - network_diagram.bottom;
+    network_width = network_diagram_container.width - network_diagram.left - network_diagram.right,
+    network_height = network_diagram_container.height - network_diagram.top - network_diagram.bottom;
 
 var isChord = false;
 var selected_node = null;
@@ -25,7 +24,7 @@ const simulation = d3.forceSimulation(network_data.nodes)
     )
     .force("charge", d3.forceManyBody().strength(-200))
     .force("x", d3.forceX(0))
-    .force("y", d3.forceY(-50))
+    .force("y", d3.forceY(+5))
     .force("collide", d3.forceCollide(d => 30))
 
 var allNodes = network_data.nodes.map(function (d) { return d.name })
@@ -153,7 +152,8 @@ node.call(d3.drag()
                 .duration(200)
                 .attr("d", d => ["M", circlify(d.source.name)[0], circlify(d.source.name)[1],  // M P1X P1Y
                     "Q", 0, 0, // Q C1X C1Y
-                    circlify(d.target.name)[0], circlify(d.target.name)[1]].join(" ")) // P2X P2Y
+                    circlify(d.target.name)[0], circlify(d.target.name)[1] // P2X P2Y
+                ].join(" ")) 
                 .style("stroke", a => { return keyword_color_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 : network_keyword_count[a.source.name][a.target.name]) })
                 .style("opacity", a => a.source.id === d.id || a.target.id === d.id ? 0.8 : 0.1);
         } else {
@@ -169,11 +169,28 @@ node.call(d3.drag()
 
     });
 
+function filter_coin_nodes(filter){
+    node.style("stroke", function(d){
+        if(filter == "") {
+            return "rgba(82, 82, 82, 0.3)";
+        }
+
+        try{
+            if(coin_map_to_slug[d.name]["name"].toUpperCase().indexOf(filter.toUpperCase()) > -1){
+                return "red";
+            } else {
+                return "rgba(82, 82, 82, 0.3)";
+            }
+        } catch {
+            return "rgba(82, 82, 82, 0.3)";
+        }
+    })
+};
 
 // Circle Dragging
 function drag_started(event, d) {
     if (isChord) return;
-    if (!event.active) simulation.alphaTarget(0.001).restart();
+    if (!event.active) simulation.alphaTarget(0.03).restart();
     d.fx = validate_point(d.x, network_width);
     d.fy = validate_point(d.y, network_height);
 
@@ -188,7 +205,7 @@ function dragged(event, d) {
 
 function drag_ended(event, d) {
     if (isChord) return;
-    if (!event.active) simulation.alphaTarget(.03);
+    if (!event.active) simulation.alphaTarget(0.03);
     d.fx = null;
     d.fy = null;
 
@@ -217,4 +234,9 @@ function ticked(transition_duration = 50) {
 function validate_point(point, bounds) {
     bounds = bounds / 2
     return (Math.abs(point) < bounds ? point : Math.sign(point) * bounds);
+}
+
+function simulation_visible(isVisible){
+    if(isVisible){}
+    else { simulation.stop(); }
 }

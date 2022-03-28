@@ -37,7 +37,7 @@ def restructure_subreddit_data(reddit_data):
     return subreddit_data_slice, last_post_time
 
 def getPushshiftData(time_start, subreddit):
-    url = 'https://api.pushshift.io/reddit/search/submission/?size=1000&before={}&subreddit={}'.format(time_start, subreddit)
+    url = 'https://api.pushshift.io/reddit/search/submission/?size=500&before={}&subreddit={}'.format(time_start, subreddit)
     
     r = requests.get(url)
     data = r.json()
@@ -51,13 +51,17 @@ def pull_subreddit_data(subreddit_name, days_ago = 1):
     collected_data = pd.DataFrame()
     last_post = int(time.time())
     try:
-        for i in range(0,1000):
-            logger.info("Searching @{}".format(last_post))
-            data, last_post = getPushshiftData(last_post, subreddit_name)
-            collected_data = collected_data.append(data, ignore_index=True)
-            if((int(time.time()) - int(last_post)) >= days_ago*86400 ): # time difference is more than a certain span of seconds (86400 secs in a day)
-                # Break out by throwing a 'Done' error
-                raise Exception("Done")
+        for i in range(0,100):
+            logger.info("Searching on iteration {}/1000: {}@{}".format(i,subreddit_name, last_post))
+            try:
+                data, last_post = getPushshiftData(last_post, subreddit_name)
+                collected_data = collected_data.append(data, ignore_index=True)
+            except Exception as e:
+                logger.error(e)
+            finally:
+                if((int(time.time()) - int(last_post)) >= days_ago*86400 ): # time difference is more than a certain span of seconds (86400 secs in a day)
+                    # Break out by throwing a 'Done' error
+                    raise Exception("Done")
     except Exception as e:
         print(e)
     return collected_data

@@ -97,7 +97,7 @@ function transition_display() {
 }
 
 
-var onInterval = window.setInterval(transition_display, 1000);
+var transitionWindow = window.setInterval(transition_display, 1000);
 
 // Initialize the home page
 coin_display_init();

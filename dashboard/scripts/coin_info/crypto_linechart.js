@@ -47,7 +47,11 @@ var areaGradient = line_svg.append("defs")
 var area_top_col = areaGradient.append("stop")
 var area_bottom_col = areaGradient.append("stop")
 
-var rearrangedData = historical_coin_data[allGroup[0]].open.map(function (d, i) { return { "data": d, "timestamp": historical_coin_data[allGroup[0]].timestamp[i] }; });
+var formatted_historical_data = new Object()
+
+Object.keys(historical_coin_data).forEach((coin_name)=>{
+    formatted_historical_data[coin_name] = historical_coin_data[coin_name].open.map(function (d, i) { return { "data": d, "timestamp": historical_coin_data[coin_name].timestamp[i] }; });
+})
 
 //
 // ACTUAL LINE DEFINITION
@@ -114,7 +118,7 @@ var zoom = d3.zoom()
     .translateExtent([[0, 0], [line_width, line_height]])
     .extent([[0, 0], [line_width, line_height]])
 
-var clip = line_svg.append("defs").append("svg:clipPath")
+var clip = focus.append("defs").append("svg:clipPath")
     .attr("id", "clip")
     .append("svg:rect")
     .attr("width", line_width)
@@ -161,7 +165,7 @@ function update_graph(selectedGroup) {
 
     line_y_axis.call(d3.axisLeft(new_y).ticks(5));
     // Create new data with the selection
-    var rearrangedData = historical_coin_data[selectedGroup].open.map(function (d, i) { return { "data": d, "timestamp": historical_coin_data[selectedGroup].timestamp[i] }; });
+    var rearrangedData = formatted_historical_data[selectedGroup];
         
     // Give these new data points to update line
     area
@@ -172,9 +176,9 @@ function update_graph(selectedGroup) {
             .x(function (d) { return new_x(new Date(d.timestamp)) })
             .y1(function (d) { return new_y(+d.data) })
             .y0(function (d) { return new_y(y_min - y_range * 0.1) })
-
         )
         .attr("fill", "url(#areaGradient)")
+        .attr("clip-path", "url(#clip)")
 
     line
         .datum(rearrangedData)
@@ -187,7 +191,8 @@ function update_graph(selectedGroup) {
         .attr("stroke", function (d) { return myColor(selectedGroup) })
         .attr("stroke-width", "3px")
         .attr("fill", "none")
-        .style("filter", "drop-shadow(0px 0px 5px " + myColor(selectedGroup) + ")");
+        .style("filter", "drop-shadow(0px 0px 5px " + myColor(selectedGroup) + ")")
+        .attr("clip-path", "url(#clip)")
 
     area_top_col.transition()
         .duration(1000)
@@ -201,7 +206,6 @@ function update_graph(selectedGroup) {
         .attr("stop-opacity", 0);
 
     // Add the line number 2 data this shows all time as opposed to brushed area
-    console.log(rearrangedData)
     line_2.datum(rearrangedData)
         .transition()
         .duration(1000)
@@ -244,7 +248,8 @@ function update_graph(selectedGroup) {
         .attr("stroke-width", "3px")
         .style("opacity", 0.3)
         .attr("fill", "none")
-        .style("filter", "drop-shadow(0px 0px 5px black)");
+        .style("filter", "drop-shadow(0px 0px 5px black)")
+        .attr("clip-path", "url(#clip)");
     
     sentiment_line_y_axis.call(d3.axisRight(sentiment_y).ticks(5));
 
@@ -285,7 +290,6 @@ function update_graph(selectedGroup) {
     }
     
     zoomed = (event) => {
-        console.log("running?")
         if (event.sourceEvent == undefined || (event.sourceEvent.type == "wheel" || event.sourceEvent.type == "mousemove") != true) return; // ignore zoom-by-brush
         
         var t = event.transform;
