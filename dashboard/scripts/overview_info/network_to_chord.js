@@ -64,10 +64,18 @@ var graphNodes = network_svg.selectAll("g graphNodes")
 graphNodeEnter = graphNodes.enter()
     .append("g")
 
+var node_color_scale = d3.scaleSequential().interpolator(d3.interpolateMagma).domain([0, 1])
+
 const node = graphNodeEnter.attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
     .append("circle")
     .attr("r", 9)
     .attr("class", "networkGraph-node")
+    .style("fill", (d) =>{
+        console.log(d.data)
+        console.log(node_color_scale(d.data.normalized_betweeness))
+        return node_color_scale(d.data.normalized_betweeness)
+
+    })
 
 const nodeLabel = graphNodeEnter.attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
     .append("text")

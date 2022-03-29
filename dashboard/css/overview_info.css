@@ -92,7 +92,7 @@
 
 .networkGraph-node-Highlighted{
     fill: rgb(160, 185, 255);
-    stroke: rgba(255, 255, 255, 0.3);
+    stroke: rgba(187, 84, 84, 0.3);
     stroke-width: 3px;
     cursor: pointer;
 }

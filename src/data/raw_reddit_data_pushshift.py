@@ -51,7 +51,7 @@ def pull_subreddit_data(subreddit_name, days_ago = 1):
     collected_data = pd.DataFrame()
     last_post = int(time.time())
     try:
-        for i in range(0,100):
+        for i in range(0,1000):
             logger.info("Searching on iteration {}/1000: {}@{}".format(i,subreddit_name, last_post))
             try:
                 data, last_post = getPushshiftData(last_post, subreddit_name)
