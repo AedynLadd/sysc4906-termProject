@@ -36,6 +36,9 @@ https://www.overleaf.com/1613467463dczmnhxynwsj
 ### Dashboard Link
 https://aedynladd.github.io/sysc4906-termProject/
 
+### Project Final Report
+https://www.overleaf.com/3577894345mwxmjmxzjskx
+
 ### Project Folder Structure
 ├── LICENSE <br/>
 ├── Makefile           <- Makefile with commands like `make data` or `make train`  <br/>
