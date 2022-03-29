@@ -5,12 +5,16 @@ import time
 import json
 import logging
 import datetime
+from tokenize import group
 import numpy
 import pandas as pd
 from pathlib import Path
 
 logger = logging.getLogger("SummarizeData")
 project_dir = "./"
+
+
+group_by_subs = False
 
 def boolean_df(item_lists, unique_items):
     # Create empty dict
@@ -27,9 +31,9 @@ def boolean_df(item_lists, unique_items):
 def sub_df_analysis(x):
     try:
         time_group = x.iloc[0]["timestamp"]
-        subreddit_group = x.iloc[0]["source"]
+        if(group_by_subs):
+            subreddit_group = x.iloc[0]["source"]
 
-        print(subreddit_group)
         number_posts = x["data"].count()
 
         sentiment_df = pd.DataFrame()
@@ -42,30 +46,52 @@ def sub_df_analysis(x):
         boolean_mask = boolean_df(x["keywords"], unique_keywords)
 
         if boolean_mask.empty:
-            return pd.Series({
-                "source": subreddit_group,
-                "timestamp": time_group,
-                "number_of_posts": number_posts,
-                "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
-                "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
-                "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
-                "keyword_based_sentiment": {}
-                })
+            if group_by_subs:
+                return pd.Series({
+                    "source": subreddit_group,
+                    "timestamp": time_group,
+                    "number_of_posts": number_posts,
+                    "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
+                    "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
+                    "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
+                    "keyword_based_sentiment": {}
+                    })
+            else:   
+                return pd.Series({
+                    "timestamp": time_group,
+                    "number_of_posts": number_posts,
+                    "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
+                    "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
+                    "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
+                    "keyword_based_sentiment": {}
+                    })
         else:
             keyword_post_count_mask = boolean_mask.sum()
             keyword_sentiment_mask = (boolean_mask.multiply(sentiment_df["positive_sentiment"], axis="index") + (-1*boolean_mask.multiply(sentiment_df["negative_sentiment"], axis="index"))).sum()
             
             test = pd.concat([keyword_post_count_mask.rename("count"), keyword_sentiment_mask.rename("sentiment")], axis=1, join="inner").transpose()
             
-            return pd.Series({
-                "source": subreddit_group,
-                "timestamp": time_group,
-                "number_of_posts": number_posts,
-                "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
-                "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
-                "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
-                "keyword_based_sentiment": test.to_dict()
-                })
+            if(group_by_subs):
+                return pd.Series({
+                    "source": subreddit_group,
+                    "timestamp": time_group,
+                    "number_of_posts": number_posts,
+                    "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
+                    "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
+                    "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
+                    "keyword_based_sentiment": test.to_dict()
+                    })
+            else:
+                return pd.Series({
+                    "timestamp": time_group,
+                    "number_of_posts": number_posts,
+                    "overall_positivity_sum": sentiment_df["positive_sentiment"].sum(),
+                    "overall_negativity_sum": sentiment_df["negative_sentiment"].sum(),
+                    "overall_neutrality_sum": sentiment_df["neutral_sentiment"].sum(),
+                    "keyword_based_sentiment": test.to_dict()
+                    })
+
+
     except Exception as e:
         logger.error("An error occured {}".format(e))
             
@@ -73,7 +99,10 @@ def sub_df_analysis(x):
 
 def summarize_data(data_file):
 
-    summarized_data = data_file.groupby(["timestamp", "source"]).apply(sub_df_analysis)
+    if(group_by_subs):
+        summarized_data = data_file.groupby(["timestamp", "source"]).apply(sub_df_analysis)
+    else:
+        summarized_data = data_file.groupby(["timestamp"]).apply(sub_df_analysis)
     
     return summarized_data
 
@@ -92,7 +121,11 @@ if __name__ == '__main__':
         reddit_corpus = pd.read_json("{}/data/interim/reddit_processed.json".format(project_dir))
         summary = summarize_data(reddit_corpus)
 
-        summary.to_json("{}/data/processed/{}_summary.json".format(project_dir, "reddit"), orient="index")
+        if(group_by_subs):
+            summary.to_json("{}/data/processed/{}_summary_all.json".format(project_dir, "reddit"), orient="index")
+        else:
+            summary.to_json("{}/data/processed/{}_summary_subs.json".format(project_dir, "reddit"), orient="index")
+            
         logger.info("Data Summary Completed")
     except Exception as e:
         logger.error(e)

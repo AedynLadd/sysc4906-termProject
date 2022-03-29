@@ -62,6 +62,8 @@ def pull_subreddit_data(subreddit_name, days_ago = 1):
                 if((int(time.time()) - int(last_post)) >= days_ago*86400 ): # time difference is more than a certain span of seconds (86400 secs in a day)
                     # Break out by throwing a 'Done' error
                     raise Exception("Done")
+    except KeyboardInterrupt as e:
+        print("Ending search through the {} subreddit".format(subreddit_name))
     except Exception as e:
         print(e)
     return collected_data

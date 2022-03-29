@@ -56,6 +56,9 @@ def filter_raw(input_text):
 
 def keyword_search(input_text):
     punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
+
+    input_text.replace("&amp", "")
+    
     for element in input_text:
         if element in punc:
             input_text = input_text.replace(element, "")

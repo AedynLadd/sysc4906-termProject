@@ -11,7 +11,7 @@ top_100_coins.forEach(coin => coin_map_to_name[coin.name.toLowerCase()] = { "nam
 var heatmap_container_bounds = document.getElementById("coin_sentiment_heatmap").getBoundingClientRect();
 
 // set the dimensions and margins of the graph
-const heat_margin = { top: 10, right: 30, bottom: 30, left: 60 },
+const heat_margin = { top: 10, right: 30, bottom: 30, left: 50 },
     heat_width = heatmap_container_bounds.width - heat_margin.left - heat_margin.right,
     heat_height = heatmap_container_bounds.height - heat_margin.top - heat_margin.bottom;
 
@@ -43,6 +43,7 @@ var heat_y = d3.scaleBand()
     .domain(Subreddits)
     .padding(0);
 
+
 var heat_x_range = d3.scaleLinear()
     .domain([d3.min(Dates), d3.max(Dates)])
     .range([0, heat_width]);
@@ -55,10 +56,10 @@ var heat_x_axis = heat_svg.append("g")
 
 var heat_y_axis = heat_svg.append("g")
     .attr("class", "heatmap_axis")
-    .call(d3.axisLeft(heat_y).tickSize(0));
+//     .call(d3.axisLeft(heat_y).tickSize(0));
 
-heat_y_axis.selectAll(".tick text")
-    .style("font-size", "10px")
+// heat_y_axis.selectAll(".tick text")
+//     .style("font-size", "10px")
 
 var heatMapColor = d3.scaleSequential()
     .interpolator(d3.interpolateInferno)
@@ -67,6 +68,7 @@ var heatMapColor = d3.scaleSequential()
 fill_data = []
 Dates.forEach(thisDate => { Subreddits.forEach(thisSub => { fill_data.push({ "timestamp": thisDate, "subreddit": thisSub, "value": 0 }) }) });
 
+// Create Heatmap elements
 heat_svg.selectAll(".sentiment_map")
     .data(fill_data)
     .enter()
@@ -77,6 +79,30 @@ heat_svg.selectAll(".sentiment_map")
     .attr("width", heat_x.bandwidth())
     .attr("height", heat_y.bandwidth())
     .style("opacity", 0.5);
+
+
+// Create Labels
+var sentiment_label_enter = heat_svg.selectAll(".heatMapRedditNames")
+    .data(Array.from(Subreddits))
+    .enter()
+    .append("g").attr("class", "heatMapRedditNames").on("mouseover", function(event, d){
+        console.log(d)
+    })
+
+sentiment_label_enter.append("rect")
+    .attr("x", 0)
+    .attr("y", d => heat_y(d) )
+    .attr("width", heat_width)
+    .attr("height", heat_y.bandwidth())
+
+sentiment_label_enter.append("text")
+    .attr("class", "heatMapRedditNames Labels")
+    .attr("x", heat_width*0.1)
+    .attr("y", function (d) { return heat_y(d) + heat_y.bandwidth()/2 })
+    .text(d => {
+        return "r/" + d
+    })
+    .style("font-size", heat_y.bandwidth()/2)
 
 
 day_summary_data = new Object();
@@ -96,7 +122,7 @@ function sentiment_heatmap(selectedGroup) {
             }
         });
         rearranged_data[val.timestamp + ":" + val.source] = overall_score;
-        day_summary_data[val.timestamp] = day_summary_data[val.timestamp] == null ? overall_score : (day_summary_data[val.timestamp]+overall_score);
+        day_summary_data[val.timestamp] = day_summary_data[val.timestamp] == null ? overall_score : (day_summary_data[val.timestamp] + overall_score);
     });
 
     heat_svg.selectAll(".sentiment_map")

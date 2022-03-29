@@ -30,13 +30,13 @@ def compile_historical_data():
 
 def compile_reddit_summary_data():
     try:
-        f = open("{}/data/processed/reddit_summary.json".format(project_dir))
+        f = open("{}/data/processed/reddit_summary_subs.json".format(project_dir))
         compiled_reddit_summary = json.load(f)
         try:
-            new_f = open("{}/dashboard/data/reddit_summary.js".format(project_dir), "w")
+            new_f = open("{}/dashboard/data/reddit_summary_subs.js".format(project_dir), "w")
             new_f.write("const reddit_summary = {}".format(compiled_reddit_summary))
         except:
-            new_f = open("{}/dashboard/data/reddit_summary.js".format(project_dir), "x")
+            new_f = open("{}/dashboard/data/reddit_summary_subs.js".format(project_dir), "x")
             new_f.write("const reddit_summary = {}".format(compiled_reddit_summary))
         return 200
     except Exception as e:
@@ -101,6 +101,14 @@ def create_network_formatted_data():
     id = 0
     node_count_list = {}
     G = nx.Graph()
+
+    node_link_list = {}
+
+    for node in unique_nodes:
+        id += 1
+        node_link_list[id] = []
+
+    id = 0
     for node in unique_nodes:
         id += 1
         OurNodes.append({
@@ -114,14 +122,20 @@ def create_network_formatted_data():
 
             node_count_list[node][str(element[0])] = int(count)
             end_id = list(unique_nodes).index(element[0]) + 1
-            if(id != end_id and int(count) >= 5):
-                G.add_edge(id, end_id)
+
+            if(id != end_id):
                 
-                OurLinks.append({
-                    "source": id,
-                    "target": end_id,
-                    "value": int(count)
-                })
+                G.add_edge(id, end_id)
+
+                if(not(id in node_link_list[end_id] and end_id in node_link_list[id])):
+                    node_link_list[end_id].append(id)
+                    node_link_list[id].append(end_id)
+
+                    OurLinks.append({
+                        "source": id,
+                        "target": end_id,
+                        "value": int(count)
+                    })
 
     degree_centrality = nx.degree_centrality(G)
     

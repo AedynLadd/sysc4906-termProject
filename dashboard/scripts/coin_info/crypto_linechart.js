@@ -2,7 +2,7 @@
 var line_chart_container = document.getElementById("coin_chart_data").getBoundingClientRect();
 
 // set the dimensions and margins of the graph
-const line_margin = {top: 20, right: 20, bottom: line_chart_container.height*0.5, left: 40},
+const line_margin = {top: 20, right: 20, bottom: line_chart_container.height*0.5, left: 50},
     margin2 = {top: line_chart_container.height*0.6, right: 20, bottom: line_chart_container.height*0.01, left: 40},
     line_width = (line_chart_container.width - line_margin.left - line_margin.right)*0.99,
     line_height = line_chart_container.height - line_margin.top - line_margin.bottom,
