@@ -1,5 +1,7 @@
 var coin_map_to_slug = new Object()
+var name_identifier = new Object()
 top_100_coins.forEach(coin => coin_map_to_slug[coin.slug] = { "name": coin.name, "slug": coin.slug, "symbol": coin.symbol });
+top_100_coins.forEach(coin => name_identifier[coin.symbol] = coin.name)
 
 var network_diagram_container = document.getElementById("keyword_network_diagram").getBoundingClientRect();
 
@@ -22,9 +24,9 @@ const simulation = d3.forceSimulation(network_data.nodes)
         .id(function (d) { return d.id; })
         .links(network_data.links)
     )
-    .force("charge", d3.forceManyBody().strength(-200))
+    .force("charge", d3.forceManyBody().strength(-100))
     .force("x", d3.forceX(0))
-    .force("y", d3.forceY(+5))
+    .force("y", d3.forceY(-50))
     .force("collide", d3.forceCollide(d => 30))
 
 var allNodes = network_data.nodes.map(function (d) { return d.name })
@@ -44,7 +46,7 @@ function circlify(point) {
     return [x_value, y_value]
 }
 
-var keyword_scale = d3.scaleLinear().range([0.4, 1]).domain([0, 100]);
+var keyword_scale = d3.scaleLinear().range([0.8, 1]).domain([0, 100]);
 var keyword_color_scale = d3.scaleSequential().interpolator(d3.interpolateMagma).domain([0, 100])
 
 // Initialize Network diagrams
@@ -163,7 +165,7 @@ node.call(d3.drag()
                     circlify(d.target.name)[0], circlify(d.target.name)[1] // P2X P2Y
                 ].join(" ")) 
                 .style("stroke", a => { return keyword_color_scale(network_keyword_count[a.source.name][a.target.name] == null ? 1 : network_keyword_count[a.source.name][a.target.name]) })
-                .style("opacity", a => a.source.id === d.id || a.target.id === d.id ? 0.8 : 0.1);
+                .style("opacity", a => a.source.id === d.id || a.target.id === d.id ? 1 : 0.04);
         } else {
             simulation.restart();
             // Network highlighting
@@ -184,7 +186,7 @@ function filter_coin_nodes(filter){
         }
 
         try{
-            if(coin_map_to_slug[d.name]["name"].toUpperCase().indexOf(filter.toUpperCase()) > -1){
+            if(name_identifier[d.name.toUpperCase()].toUpperCase().indexOf(filter.toUpperCase()) > -1){
                 return "red";
             } else {
                 return "rgba(82, 82, 82, 0.3)";
@@ -198,7 +200,7 @@ function filter_coin_nodes(filter){
 // Circle Dragging
 function drag_started(event, d) {
     if (isChord) return;
-    if (!event.active) simulation.alphaTarget(0.03).restart();
+    if (!event.active) simulation.alphaTarget(0.1).restart();
     d.fx = validate_point(d.x, network_width);
     d.fy = validate_point(d.y, network_height);
 
@@ -213,7 +215,7 @@ function dragged(event, d) {
 
 function drag_ended(event, d) {
     if (isChord) return;
-    if (!event.active) simulation.alphaTarget(0.03);
+    if (!event.active) simulation.alphaTarget(0.1);
     d.fx = null;
     d.fy = null;
 

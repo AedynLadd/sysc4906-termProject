@@ -27,6 +27,7 @@ function search_coin() {
 }
 
 function update(selectedCoin) {
+    console.log(selectedCoin)
     localStorage.setItem("selectedCoin", selectedCoin)
 
     try { document.getElementById("coin_id_" + selectedCoin).className = "coin_selected" } catch {}
