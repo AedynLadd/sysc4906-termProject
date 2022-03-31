@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <!-- VERSION 2.0 -->
 <html>
+
 <head>
   <title>SYSC 4906 Term Project</title>
   <link rel="stylesheet" href="dashboard/css/index.css">
@@ -14,7 +15,7 @@
 <body>
   <div id="dashboard_header" class="dashboard_header">
     <div class="title_header courseCodeSYSC">SYSC</div>
-    <div class = "title_header courseCode4906">4906</div>
+    <div class="title_header courseCode4906">4906</div>
     <div class="title_header Maintitle"> - CRYPTOCURRENCY SENTIMENT ANALYSIS</div>
   </div>
   <!-- DISPLAY CONTAINER -->
@@ -22,29 +23,30 @@
     <!-- LEFT COIN SELECTOR -->
     <ul class="coin_select" id="coin_select">
       <div class="coin_select_overview" onclick="update(null)"> Overview </div>
-      <input type="text" class="coinSearch" id="coinSearch" onkeyup="search_coin()" placeholder="Search.." title=" Enter a coin you want to learn more about">
+      <input type="text" class="coinSearch" id="coinSearch" onkeyup="search_coin()" placeholder="Search.."
+        title=" Enter a coin you want to learn more about">
     </ul>
     <!-- OVERVIEW INFO (RIGHT - OPT) -->
-    <div class = "overview_info" id = "overview_info_container">
-      <div class = "cyclic_coin_info" id = "cyclic_coin_info" ></div>
-      <div class = "keyword_network_diagram" id ="keyword_network_diagram"></div>
-      <div class = "network_diagram_data" id = "network_diagram_data">
+    <div class="overview_info" id="overview_info_container">
+      <div class="cyclic_coin_info" id="cyclic_coin_info"></div>
+      <div class="keyword_network_diagram" id="keyword_network_diagram"></div>
+      <div class="network_diagram_data" id="network_diagram_data">
         <div class="additional_coin_info_box" id="additional_coin_info_box">
-          <div class="additional_coin_info_box_title" id = "additional_coin_info_box_title"></div>
-          <div class="additional_coin_info_box_substats" id = "additional_coin_info_box_substats"></div>
-          <div class="coin_joyplots" id="coin_joyplots"></div>
+          <div class="additional_coin_info_box_title" id="additional_coin_info_box_title"></div>
+          <div class="additional_coin_info_box_substats" id="additional_coin_info_box_substats"></div>
+          <div class="chartA" id="chartA"></div>
         </div>
       </div>
     </div>
     <!-- SPECIFIC COIN INFO (RIGHT - OPT)-->
-    <div class = "coin_info" id = "coin_info_container">
-      <div class="coin_chart_data" id = "coin_chart_data"></div>
+    <div class="coin_info" id="coin_info_container">
+      <div class="coin_chart_data" id="coin_chart_data"></div>
       <div class="coin_sentiment_heatmap" id="coin_sentiment_heatmap"></div>
-      <div class="additional_coin_info" id="additional_coin_info">
+      <div class="forecast_coin_chart" id="forecast_coin_chart">
 
-        </div>
       </div>
     </div>
+  </div>
   </div>
 </body>
 <!--  DATA VARIABLES  -->
@@ -54,13 +56,16 @@
 <script type="text/javascript" src="dashboard/data/reddit_summary_subs.js"></script>
 <script type="text/javascript" src="dashboard/data/keyword_network_data.js"></script>
 <script type="text/javascript" src="dashboard/data/keyword_count_data.js"></script>
+<script type="text/javascript" src="dashboard/data/forecast_data.js"></script>
 <!--  VISUALIZATION SCRIPTS  -->
 <script type="text/javascript" src="dashboard/scripts/coin_info/crypto_linechart.js"></script>
 <script type="text/javascript" src="dashboard/scripts/coin_info/sentiment_heatmap.js"></script>
+<script type="text/javascript" src="dashboard/scripts/coin_info/forecast_linechart.js"></script>
 <!-- SUMMARY PAGE VISUALIZATIONS -->
 <script type="text/javascript" src="dashboard/scripts/overview_info/coin_summary.js"></script>
 <script type="text/javascript" src="dashboard/scripts/overview_info/info_display.js"></script>
 <script type="text/javascript" src="dashboard/scripts/overview_info/network_to_chord.js"></script>
 <!-- UPDATE SCRIPT -->
 <script type="text/javascript" src="dashboard/scripts/update_coin.js"></script>
+
 </html>

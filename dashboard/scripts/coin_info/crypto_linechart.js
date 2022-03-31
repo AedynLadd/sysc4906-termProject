@@ -52,7 +52,6 @@ var formatted_historical_data = new Object()
 Object.keys(historical_coin_data).forEach((coin_name)=>{
     formatted_historical_data[coin_name] = historical_coin_data[coin_name].open.map(function (d, i) { return { "data": d, "timestamp": historical_coin_data[coin_name].timestamp[i] }; });
 })
-
 //
 // ACTUAL LINE DEFINITION
 // Initialize line with first group of the list

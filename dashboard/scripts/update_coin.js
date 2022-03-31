@@ -27,7 +27,6 @@ function search_coin() {
 }
 
 function update(selectedCoin) {
-    console.log(selectedCoin)
     localStorage.setItem("selectedCoin", selectedCoin)
 
     try { document.getElementById("coin_id_" + selectedCoin).className = "coin_selected" } catch {}
@@ -43,6 +42,7 @@ function update(selectedCoin) {
         display_specific_coin.style.display = "grid";
         sentiment_heatmap(selectedCoin);
         update_graph(selectedCoin);
+        update_forecast(selectedCoin);
         simulation_visible(false);
     }
 }

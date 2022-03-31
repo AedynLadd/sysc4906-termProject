@@ -179,6 +179,21 @@ def create_network_formatted_data():
 
     return 200
 
+def compile_forecast_data():
+    try:
+        f = open("{}/data/processed/7d_forecast.json".format(project_dir))
+        sevenD_forecast = json.load(f)
+        try:
+            new_f = open("{}/dashboard/data/forecast_data.js".format(project_dir), "w")
+            new_f.write("const sevenD_forecast = {}".format(sevenD_forecast))
+        except:
+            new_f = open("{}/dashboard/data/forecast_data.js".format(project_dir), "x")
+            new_f.write("const sevenD_forecast = {}".format(sevenD_forecast))
+        return 200
+    except Exception as e:
+        logger.info(e)
+        return 400
+
 
 if __name__ == '__main__':
     try:
@@ -193,11 +208,12 @@ if __name__ == '__main__':
 
         logger.info("Running in {}".format(project_dir))
         
-        compile_historical_data()
-        compile_reddit_summary_data()
-        compile_top_coin_data()
-        create_network_formatted_data()
-
+        logger.info("Compiling Historical data: {}".format(compile_historical_data()))
+        logger.info("Compiling Reddit Summary Data: {}".format(compile_reddit_summary_data()))
+        logger.info("Compiling Top Coin Data: {}".format(compile_top_coin_data()))
+        logger.info("Compiling Forecasting Data: {}".format(compile_forecast_data()))
+        logger.info("Compiling Network Data: {}".format(create_network_formatted_data()))
+    
         logger.info("Dashboard compilation completed - - - Exiting")
     except Exception as e:
         logger.error(e)

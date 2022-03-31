@@ -61,10 +61,6 @@ var heat_y_axis = heat_svg.append("g")
 // heat_y_axis.selectAll(".tick text")
 //     .style("font-size", "10px")
 
-var heatMapColor = d3.scaleSequential()
-    .interpolator(d3.interpolateInferno)
-    .domain([0, 1])
-
 fill_data = []
 Dates.forEach(thisDate => { Subreddits.forEach(thisSub => { fill_data.push({ "timestamp": thisDate, "subreddit": thisSub, "value": 0 }) }) });
 
@@ -86,7 +82,7 @@ var sentiment_label_enter = heat_svg.selectAll(".heatMapRedditNames")
     .data(Array.from(Subreddits))
     .enter()
     .append("g").attr("class", "heatMapRedditNames").on("mouseover", function(event, d){
-        console.log(d)
+        
     })
 
 sentiment_label_enter.append("rect")
@@ -104,35 +100,54 @@ sentiment_label_enter.append("text")
     })
     .style("font-size", heat_y.bandwidth()/2)
 
+var heatMapColor = d3.scaleSequential()
+    .interpolator(d3.interpolateInferno)
+    .domain([0, 1])
 
 day_summary_data = new Object();
 
 function sentiment_heatmap(selectedGroup) {
-    selectedGroup = selectedGroup.split("_").join(" ")
+    var selectedGroup = selectedGroup.split("_").join(" ")
 
     var keywords_of_interest = Object.values(coin_map_to_name[selectedGroup.toLowerCase()])
 
-    day_summary_data = new Object();
+    var day_summary_data = new Object();
     var rearranged_data = new Object();
+    var highest_val = 0;
+    var lowest_val = 0;
+
     Object.values(reddit_summary).forEach(val => {
         let overall_score = 0;
         Object.entries(val.keyword_based_sentiment).forEach(keyword_val => {
             if (keywords_of_interest.includes(keyword_val[0])) {
-                overall_score += keyword_val[1].sentiment
+                overall_score += keyword_val[1].sentiment*keyword_val[1].count
             }
         });
         rearranged_data[val.timestamp + ":" + val.source] = overall_score;
+
+        if(overall_score > highest_val){
+            highest_val = overall_score
+        }
+
+        if(overall_score < lowest_val){
+            lowest_val = overall_score
+        }
+
         day_summary_data[val.timestamp] = day_summary_data[val.timestamp] == null ? overall_score : (day_summary_data[val.timestamp] + overall_score);
     });
+
 
     heat_svg.selectAll(".sentiment_map")
         .transition()
         .duration(1000)
         .style("fill", function (d) {
+            console.log(rearranged_data[d.timestamp + ":" + d.subreddit])
             if (rearranged_data[d.timestamp + ":" + d.subreddit] != null) {
-                return heatMapColor(rearranged_data[d.timestamp + ":" + d.subreddit]);
+                //return heatMapColor(rearranged_data[d.timestamp + ":" + d.subreddit] / highest_val);
+                return heatMapColor(Math.log(rearranged_data[d.timestamp + ":" + d.subreddit])/ Math.log(highest_val));
             } else {
-                return heatMapColor(d.value)
+                console.log("Is this running ever?")
+                return heatMapColor(d.val)
             }
         });
 }

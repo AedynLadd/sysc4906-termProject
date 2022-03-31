@@ -5,10 +5,8 @@ top_100_coins.forEach(coin => name_identifier[coin.symbol] = coin.name)
 
 function display_coin_info(coin_data) {
     if (coin_data == null) {
-        console.log("displaying an overview")
         document.getElementById("additional_coin_info_box_title").innerHTML = "OVERVIEW"
     } else {
-        console.log("displaying info on a specific coin")
         document.getElementById("additional_coin_info_box_title").innerHTML = name_identifier[coin_data.name.toUpperCase()].toUpperCase()
     }
 }

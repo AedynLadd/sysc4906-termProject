@@ -10,7 +10,7 @@ logger = logging.getLogger("VAR")
 
 REGRESSION_DAYS_USED = 60
 NUM_OBS = 7
-validate_or_predict = "validate"
+validate_or_predict = "predict"
 
 def create_model(data):
     train = data[:-NUM_OBS]
@@ -89,7 +89,7 @@ def format_sentiment_and_coin_data(coin_data, sentiment_data, bitcoin_sentiment)
     merged_data.index = pd.DatetimeIndex(merged_data["timestamp"]).to_period("d")
     merged_data.drop(labels = "timestamp", axis = 1, inplace=True)
     #  "btc_sentiment"
-    merged_data.drop(labels = ["high", "low", "close", "volume", "marketCap", "count"], axis=1, inplace=True)
+    merged_data.drop(labels = ["high", "low", "close", "volume", "marketCap", "count", "btc_sentiment"], axis=1, inplace=True)
 
     merged_data.dropna()
 
@@ -149,9 +149,14 @@ if __name__ == "__main__":
                 forecast_up_interval = forecast_intervals_up["open_forecast"]
                 forecast_down_interval = forecast_intervals_down["open_forecast"]
 
-                
+                saved_actual_data = actual_data[-30:].reset_index()
+                saved_actual_data.columns = ["historical_timestamp", "historical_open"]
+
+                saved_actual_timestamps = np.array(saved_actual_data["historical_timestamp"].dt.to_timestamp())
+                saved_actual_open = np.array(saved_actual_data["historical_open"])
 
                 if validate_or_predict == "validate":
+                    # VALIDATING AGAINST THE PAST
                     forecast_data = forecast_data + (actual_data[-NUM_OBS] - forecast_data[0])
                     forecast_up_interval = forecast_up_interval + (actual_data[-NUM_OBS] - forecast_up_interval[0])
                     forecast_down_interval = forecast_down_interval + (actual_data[-NUM_OBS] - forecast_down_interval[0])
@@ -167,17 +172,23 @@ if __name__ == "__main__":
                     mod_down_data.columns = ["timestamp", "downInterval_forecast"]
 
                     # Save data in numpy array
-                    open_forecast_data = np.array(mod_data["open_forecast"])
-                    timestamps = np.array(mod_data["timestamp"])
+                    open_forecast_data = np.nan_to_num(np.array(mod_data["open_forecast"]))
+                    forecast_timestamps = np.nan_to_num(np.array(mod_data["timestamp"]))
 
-                    open_up_interval = np.array(mod_up_data["upInterval_forecast"])
-                    open_down_interval = np.array(mod_down_data["downInterval_forecast"])
+                    open_up_interval = np.nan_to_num(np.array(mod_up_data["upInterval_forecast"]))
+                    open_down_interval = np.nan_to_num(np.array(mod_down_data["downInterval_forecast"]))
 
                     coin_forecasting[str(coin_name).replace(" ", "_")] = {
-                        "timestamp": timestamps.tolist(),
-                        "open_forecast": open_forecast_data.tolist(),
-                        "open_up_interval": open_up_interval.tolist(),
-                        "open_down_interval": open_down_interval.tolist(),
+                        "forecast":{
+                            "timestamp": forecast_timestamps.tolist(),
+                            "open_forecast": open_forecast_data.tolist(),
+                            "open_up_interval": open_up_interval.tolist(),
+                            "open_down_interval": open_down_interval.tolist(),
+                        },
+                        "past_data":{
+                            "timestamp": saved_actual_timestamps.tolist(),
+                            "data":saved_actual_open.tolist(),
+                        }
                     }
                     
                     actual_compare_data = actual_data[-NUM_OBS:] 
@@ -194,15 +205,16 @@ if __name__ == "__main__":
 
 
                 else:
-
+                   
+                    # PREDICTING THE FUTURE
                     forecast_data = forecast_data + (actual_data[-1] - forecast_data[0])
-                    forecast_up_interval = forecast_data + forecast_data*forecast_up_interval
-                    forecast_down_interval = forecast_data + forecast_data*forecast_down_interval
+                    forecast_up_interval = forecast_up_interval + (actual_data[-1] - forecast_up_interval[0])
+                    forecast_down_interval = forecast_down_interval + (actual_data[-1] - forecast_down_interval[0])
                     
                     # Modifying the columns
                     mod_data = forecast_data.reset_index()
                     mod_data.columns = ["timestamp", "open_forecast"]
-                    
+
                     mod_up_data = forecast_up_interval.reset_index()
                     mod_up_data.columns = ["timestamp", "upInterval_forecast"]
 
@@ -210,24 +222,29 @@ if __name__ == "__main__":
                     mod_down_data.columns = ["timestamp", "downInterval_forecast"]
 
                     # Storing data in numpy array
-                    open_forecast_data = np.array(mod_data["open_forecast"])
-                    timestamps = np.array(mod_data["timestamp"])
+                    open_forecast_data = np.nan_to_num(np.array(mod_data["open_forecast"]))
+                    forecast_timestamps = np.nan_to_num(np.array(mod_data["timestamp"]))
 
-                    open_up_interval = np.array(mod_up_data["upInterval_forecast"])
-                    open_down_interval = np.array(mod_down_data["downInterval_forecast"])
+                    open_up_interval = np.nan_to_num(np.array(mod_up_data["upInterval_forecast"]))
+                    open_down_interval = np.nan_to_num(np.array(mod_down_data["downInterval_forecast"]))
 
                     coin_forecasting[str(coin_name).replace(" ", "_")] = {
-                        "timestamp": timestamps.tolist(),
-                        "open_forecast": open_forecast_data.tolist(),
-                        "open_up_interval": open_up_interval.tolist(),
-                        "open_down_interval": open_down_interval.tolist(),
+                        "forecast":{
+                            "timestamp": forecast_timestamps.tolist(),
+                            "open_forecast": open_forecast_data.tolist(),
+                            "open_up_interval": open_up_interval.tolist(),
+                            "open_down_interval": open_down_interval.tolist(),
+                        },
+                        "past_data":{
+                            "timestamp":saved_actual_timestamps.tolist(),
+                            "data":saved_actual_open.tolist(),
+                        }
                     }
                     
                         
                 if coin_name == "Bitcoin" or coin_name == "Ethereum" or coin_name == "Polygon":
                     plt.figure(coin_name)
                     actual_data[-30:].plot(y="open")
-
 
                     forecast_up_interval.plot(y="up_forecast")
                     forecast_data.plot(y="open_forecast", color="yellow")
@@ -243,6 +260,7 @@ if __name__ == "__main__":
                     json.dump(coin_forecasting, json_file)
         except Exception as e:
             logger.error("Unable to save the forecasted data")
+            print(e)
             
         if validate_or_predict == "validate":
             with open("{}/src/models/forecasts/7d_forecast_metrics.json".format(project_dir), "w") as json_file:
