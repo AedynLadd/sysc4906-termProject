@@ -111,10 +111,12 @@ def create_network_formatted_data():
     id = 0
     for node in unique_nodes:
         id += 1
+
         OurNodes.append({
             "id": id,
             "name": node
         })
+
         node_count_list[node] = {}
         link_df = pd.DataFrame(node_links[node])
         count_df = pd.DataFrame(link_df.value_counts())
@@ -123,7 +125,7 @@ def create_network_formatted_data():
             node_count_list[node][str(element[0])] = int(count)
             end_id = list(unique_nodes).index(element[0]) + 1
 
-            if(id != end_id):
+            if(id != end_id and int(count) >= 20):
                 
                 G.add_edge(id, end_id)
 

@@ -57,15 +57,21 @@ def filter_raw(input_text):
 def keyword_search(input_text):
     punc = '''!()-[]{};:'"\,<>./?@#$%^&*_~'''
 
-    input_text.replace("&amp", "")
+    input_text.replace("&amp", " ")
     
     for element in input_text:
         if element in punc:
             input_text = input_text.replace(element, "")
 
-    input_text = input_text.lower().split(" ")
-    return [term for term in terms if term in input_text]
+    input_text = str(input_text).lower()
 
+    return [specify_term(term) for term in terms if re.search(r'\b{}\b'.format(str(term).lower()), input_text)]
+
+def specify_term(term_used):
+    try:
+        return term_mapping[term_used]
+    except Exception as e:
+        return "UNKNOWN"
 
 def validate_key(data, key):
     """
@@ -113,20 +119,18 @@ def process_data(filename):
         return processed_data
 
 
-### SUMMARIZE DATA ###
-def summarize_data():
-    data_summary = []
-
-    return data_summary
-
-
-
 if __name__ == '__main__':
     try:
         project_dir = Path(__file__).resolve().parents[2]
         text_process_config = json.load(open("{}/src/data/config/text_process_config.json".format(project_dir)))
+        top_100_coin_data = json.load(open("{}/data/raw/coinmarketcap/top_100_coins.json".format(project_dir)))
+        term_mapping = {}
+        for coin_data in top_100_coin_data["coins"]:
+            term_mapping[coin_data["slug"]] = coin_data["symbol"]
+            term_mapping[coin_data["name"]] = coin_data["symbol"]
+            term_mapping[coin_data["symbol"]] = coin_data["symbol"]
 
-        terms = text_process_config["terms"].split(", ")
+        terms = text_process_config["terms"].split(",")
 
         log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
         logging.basicConfig(level=logging.INFO, format=log_fmt,

@@ -122,9 +122,9 @@ if __name__ == '__main__':
         summary = summarize_data(reddit_corpus)
 
         if(group_by_subs):
-            summary.to_json("{}/data/processed/{}_summary_all.json".format(project_dir, "reddit"), orient="index")
-        else:
             summary.to_json("{}/data/processed/{}_summary_subs.json".format(project_dir, "reddit"), orient="index")
+        else:
+            summary.to_json("{}/data/processed/{}_summary_all.json".format(project_dir, "reddit"), orient="index")
             
         logger.info("Data Summary Completed")
     except Exception as e:

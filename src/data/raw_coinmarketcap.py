@@ -81,10 +81,10 @@ def get_top_100_coins(upper_limit = 100):
     
     x = ""
     for coin in cryptocurrencyMap:
-        x += "{}, {}, ".format(coin["slug"],coin["symbol"])
+        x += "{},{},{},".format(coin["slug"], coin["symbol"], coin["name"])
     
     cryptoMapRef = {
-        "keyword_metadata": x[0:len(x) - 2],
+        "keyword_metadata": x[0:len(x)-1],
         "coins": cryptocurrencyMap
     }
     # Save the data for future reference
