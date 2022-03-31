@@ -1,16 +1,10 @@
-from operator import invert
-from telnetlib import theNULL
 import numpy as np
 import pandas as pd
 import json
 import logging
 from pathlib import Path
 from matplotlib import pyplot as plt
-from datetime import datetime
 from statsmodels.tsa.vector_ar.var_model import VAR
-from statsmodels.tsa.vector_ar.vecm import coint_johansen
-from statsmodels.tsa.stattools import adfuller
-
 
 logger = logging.getLogger("VAR")
 
@@ -31,31 +25,10 @@ def invert_transformation(df_train, df_forecast, diff_used):
     columns = df_train.columns
     for col in columns:        
         
-        df_fc[str(col)+'_1d'] = (df_train[col].iloc[-1]-df_train[col].iloc[-2]) + df_fc[str(col)+'_2d'].cumsum()
+        #df_fc[str(col)+'_2d'] = (df_train[col].iloc[-1]-df_train[col].iloc[-2] - df_train[col].iloc[-3]) + df_fc[str(col)+'_3d'].cumsum()
+        df_fc[str(col)+'_1d'] = (df_train[col].iloc[-1]-df_train[col].iloc[-2]) + df_fc[str(col)+'_nd'].cumsum()
         
         df_fc[str(col)+'_forecast'] = df_train[col].iloc[-1] + df_fc[str(col)+'_1d'].cumsum()
-
-    return df_fc
-
-
-def invert_transformation_2(df_train, df_forecast, n_diff = 2):
-    """Revert back the differencing to get the forecast to original scale."""
-    df_fc = df_forecast.copy()
-    columns = df_train.columns
-
-    for col in columns:   
-        # roll back diff for each column
-        for i in range(n_diff, 1):
-            # Starting at N revert back to the nth diff
-            nth_change = df_train[col].iloc[-1]
-
-            if(n_diff >= 2):
-                for n in range(2, i):
-                    nth_change -= df_train[col].iloc[-i]
-            
-            df_fc[str(col) + "_{}d".format(n_diff)] = nth_change + df_fc[str(col) + "_{}d".format(n_diff)].cumsum()
-
-        df_fc[str(col) + "_forecast"] = df_fc[str(col) + "_1d"]
 
     return df_fc
 
@@ -70,14 +43,14 @@ def forecast_model(model, input_data, original_data, diff_used = 2):
         fc = model.forecast(forecasting_input, steps=NUM_OBS)
 
         idx = pd.date_range(str(original_data.index[-NUM_OBS]), periods=NUM_OBS, freq='D')
-        forecast_data = pd.DataFrame(fc, index=idx, columns=input_data.columns + '_2d')
+        forecast_data = pd.DataFrame(fc, index=idx, columns=input_data.columns + '_nd')
     else:   
         forecasting_input = input_data.values[-lag_order:]
 
         fc = model.forecast(forecasting_input, steps=NUM_OBS)
 
         idx = pd.date_range(str(original_data.index[-1]), periods=NUM_OBS, freq='D')
-        forecast_data = pd.DataFrame(fc, index=idx, columns=input_data.columns + '_2d')
+        forecast_data = pd.DataFrame(fc, index=idx, columns=input_data.columns + '_nd')
 
     return invert_transformation(original_data, forecast_data, diff_used)
 
@@ -108,8 +81,8 @@ def format_sentiment_and_coin_data(coin_data, sentiment_data, bitcoin_sentiment)
 
     merged_data.index = pd.DatetimeIndex(merged_data["timestamp"]).to_period("d")
     merged_data.drop(labels = "timestamp", axis = 1, inplace=True)
-    #merged_data.drop(labels = ["high", "low", "close", "volume", "marketCap", "count"], axis=1, inplace=True)
-    merged_data.drop(labels = ["high", "low", "close", "volume", "marketCap"], axis=1, inplace=True)
+    #  "btc_sentiment"
+    merged_data.drop(labels = ["high", "low", "close", "volume", "marketCap", "count"], axis=1, inplace=True)
 
     merged_data.dropna()
 
@@ -141,7 +114,8 @@ if __name__ == "__main__":
         sentiment_data_df = pd.read_json("{}/data/processed/reddit_summary_all.json".format(project_dir), orient="index")
         keyword_sentiment_data = sentiment_data_df["keyword_based_sentiment"].apply(pd.Series)
 
-        coin_forecasting = pd.DataFrame()
+        coin_forecasting = {}
+        forecast_metrics = {}
 
         for coin_name in coin_data:
             try:
@@ -166,23 +140,50 @@ if __name__ == "__main__":
                 
                 if validate_or_predict == "validate":
                     forecast_data = forecast_data + (actual_data[-NUM_OBS] - forecast_data[0])
-                    coin_forecasting[str(new_coin_map[str(coin_name)]["name"]).replace(" ", "_")] = forecast_data
+                    coin_forecasting[str(coin_name).replace(" ", "_")] = forecast_data
+                    
+                    actual_compare_data = actual_data[-NUM_OBS:] 
+                    
+                    residual_forecast_error = np.array(actual_compare_data) - np.array(forecast_data)
+                    forecast_bias = sum(residual_forecast_error) * 1/len(residual_forecast_error)
+                    mean_absolute_error = np.mean(abs(residual_forecast_error))
+
+                    forecast_metrics[str(coin_name).replace(" ", "_")] = {
+                        "residual_forecast_error": residual_forecast_error.tolist(),
+                        "forecast_bias": forecast_bias.tolist(),
+                        "mean_absolute_error": mean_absolute_error.tolist()
+                    }
                 else:
                     forecast_data = forecast_data + (actual_data[-1] - forecast_data[0])
-                    coin_forecasting[str(new_coin_map[str(coin_name)]["name"]).replace(" ", "_")] = forecast_data
+                    
+                    mod_data = forecast_data.reset_index()
+                    mod_data.columns = ["timestamp", "open_forecast"]
 
+                    open_forecast_data = np.array(mod_data["open_forecast"])
+                    timestamps = np.array(mod_data["timestamp"])
+
+                    coin_forecasting[str(coin_name).replace(" ", "_")] = {
+                        "timestamp": timestamps.tolist(),
+                        "open_forecast": open_forecast_data.tolist()
+                    }
+                        
                 if coin_name == "Bitcoin" or coin_name == "Ethereum" or coin_name == "Polygon":
                     plt.figure(coin_name)
                     actual_data[-30:].plot(y="open")
                     forecast_data.plot(y="open_forecast")
                     plt.savefig("{}/src/models/forecasts/output_{}.jpg".format(project_dir, coin_name))
-                
+
             except Exception as e:
                 logger.error("An error has occured {}".format(e))
 
         # save the forecasting data for display 
-        coin_forecasting.to_json("{}/data/processed/7d_forecast.json".format(project_dir), orient="index")
 
+        with open("{}/data/processed/7d_forecast.json".format(project_dir), "w") as json_file:
+                json.dump(coin_forecasting, json_file)
+        
+        if validate_or_predict == "validate":
+            with open("{}/src/models/forecasts/7d_forecast_metrics.json".format(project_dir), "w") as json_file:
+                json.dump(forecast_metrics, json_file)
 
     except Exception as e:
         logger.error("An Error has occured {}".format(e))
