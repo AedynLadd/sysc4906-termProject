@@ -8,7 +8,7 @@ import datetime
 import requests
 import pandas as pd
 from pathlib import Path
-from dotenv import find_dotenv, load_dotenv
+#from dotenv import find_dotenv, load_dotenv
 
 logger = logging.getLogger("Reddit")
 project_dir = "./"
@@ -51,8 +51,8 @@ def pull_subreddit_data(subreddit_name, days_ago = 1):
     collected_data = pd.DataFrame()
     last_post = int(time.time())
     try:
-        for i in range(0,1000):
-            logger.info("Searching on iteration {}/1000: {}@{}".format(i,subreddit_name, last_post))
+        for i in range(0,3000):
+            logger.info("Searching on iteration {}/3000: {}@{}".format(i,subreddit_name, last_post))
             try:
                 data, last_post = getPushshiftData(last_post, subreddit_name)
                 collected_data = collected_data.append(data, ignore_index=True)
