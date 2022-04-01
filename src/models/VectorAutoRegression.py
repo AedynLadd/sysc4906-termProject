@@ -1,3 +1,4 @@
+from shutil import ExecError
 import numpy as np
 import pandas as pd
 import json
@@ -8,9 +9,9 @@ from statsmodels.tsa.vector_ar.var_model import VAR
 
 logger = logging.getLogger("VAR")
 
-REGRESSION_DAYS_USED = 60
+REGRESSION_DAYS_USED = 135
 NUM_OBS = 7
-validate_or_predict = "validate"
+validate_or_predict = "predict"
 
 def create_model(data):
     train = data[:-NUM_OBS]
@@ -95,18 +96,13 @@ def format_sentiment_and_coin_data(coin_data, sentiment_data, bitcoin_sentiment)
 
     return merged_data
 
+def vectorAutoRegression(regression_days = REGRESSION_DAYS_USED, observations_made = NUM_OBS):
 
-if __name__ == "__main__":
+    REGRESSION_DAYS_USED = regression_days
+    NUM_OBS = observations_made
+
+    
     try:
-        project_dir = Path(__file__).resolve().parents[2]
-
-        log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-        logging.basicConfig(level=logging.INFO, format=log_fmt,
-                            handlers= [
-                                logging.FileHandler("{}/logs/reddit_data_logs.log".format(project_dir), mode = "w"),
-                                logging.StreamHandler()
-                            ])
-                            
         coin_mapping_file = open("{}/data/raw/coinmarketcap/top_100_coins.json".format(project_dir))
         coin_mapping = json.load(coin_mapping_file)["coins"]
 
@@ -242,29 +238,81 @@ if __name__ == "__main__":
                     }
                     
                         
-                if coin_name == "Bitcoin" or coin_name == "Ethereum" or coin_name == "Polygon":
-                    plt.figure(coin_name)
+                if coin_name == "Bitcoin":
+                    plt.figure("output_{}-{}_{}".format(coin_name, REGRESSION_DAYS_USED, NUM_OBS))
                     actual_data[-30:].plot(y="open")
 
                     forecast_up_interval.plot(y="up_forecast", color="red")
                     forecast_data.plot(y="open_forecast", color="blue")
                     forecast_down_interval.plot(y="down_forecast", color="red")
-                    plt.savefig("{}/src/models/forecasts/output_{}.jpg".format(project_dir, coin_name))
+                    plt.savefig("{}/src/models/forecasts/graphs/output_{}-{}_{}.jpg".format(project_dir, coin_name, REGRESSION_DAYS_USED, NUM_OBS))
 
             except Exception as e:
                 logger.error("An error has occured {}".format(e))
 
-        # save the forecasting data for display 
-        try:
-            with open("{}/data/processed/7d_forecast.json".format(project_dir), "w") as json_file:
-                    json.dump(coin_forecasting, json_file)
-        except Exception as e:
-            logger.error("Unable to save the forecasted data")
-            print(e)
-            
-        if validate_or_predict == "validate":
-            with open("{}/src/models/forecasts/7d_forecast_metrics.json".format(project_dir), "w") as json_file:
-                json.dump(forecast_metrics, json_file)
+        if validate_or_predict == "predict":
+            # save the forecasting data for display 
+            try:
+                with open("{}/data/processed/7d_forecast.json".format(project_dir), "w") as json_file:
+                        json.dump(coin_forecasting, json_file)
+            except Exception as e:
+                logger.error("Unable to save the forecasted data")
+                print(e)
+                
+    except Exception as e:
+        return 400, {}
+    return 200, forecast_metrics
 
+def vectorAutoRegression_summary(metrics):
+    logger.info("Summarizing our VAR Statistics")
+    try:
+        metric_df = pd.DataFrame(metrics).transpose()[["forecast_bias", "mean_absolute_error"]]
+        
+        mean = metric_df.mean()
+        return 200, mean
+    except Exception as e:
+        return 400
+
+if __name__ == "__main__":
+    try:
+        project_dir = Path(__file__).resolve().parents[2]
+
+        log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        logging.basicConfig(level=logging.INFO, format=log_fmt,
+                            handlers= [
+                                logging.FileHandler("{}/logs/reddit_data_logs.log".format(project_dir), mode = "w"),
+                                logging.StreamHandler()
+                            ])
+        
+        
+        if validate_or_predict == "predict":
+            status, metrics = vectorAutoRegression()
+            logger.info("VECTOR AUTO REGRESSION HAS COMPLETED - STATUS CODE - {}".format(status))
+
+        else:       
+            logger.info("Maximizing validation")
+            validation_stats = pd.DataFrame(columns=["trial", "mean_MAE", "mean_forecast_bias"])
+            #for days_used in range(12, 12):
+            #for regressed_days in range(5, 7, 1):   
+            try:
+                logger.info("Using {} regression days".format(135))
+                status, metrics = vectorAutoRegression(135, 5)
+                logger.info("VECTOR AUTO REGRESSION HAS COMPLETED - STATUS CODE - {}".format(status))
+                if(status == 200):
+                    status, mean = vectorAutoRegression_summary(metrics)
+                    if(status == 200):
+                        validation_stats = validation_stats.append({
+                            "trial": "{}-{}".format(135,7),
+                            "mean_forecast_bias": mean["forecast_bias"], 
+                            "mean_MAE": mean["mean_absolute_error"]
+                        }, ignore_index=True)
+
+            except Exception as e:
+                logger.info("error computing {}".format(e))
+
+            validation_stats.to_json("{}/src/models/forecasts/optimization.json".format(project_dir), orient="index")
+
+            min_validation = validation_stats.min()
+            logger.info("OPTIMAL VALUE IS {}".format(min_validation))
     except Exception as e:
         logger.error("An Error has occured {}".format(e))

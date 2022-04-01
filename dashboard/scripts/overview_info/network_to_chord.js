@@ -74,7 +74,6 @@ const node = graphNodeEnter.attr("transform", "translate(" + network_width / 2 +
     .attr("class", "networkGraph-node")
     .style("fill", (d) =>{
         return node_color_scale(d.data.normalized_betweeness)
-
     })
 
 const nodeLabel = graphNodeEnter.attr("transform", "translate(" + network_width / 2 + ',' + network_height / 2 + ")")
