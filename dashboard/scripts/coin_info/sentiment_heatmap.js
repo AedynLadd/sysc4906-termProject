@@ -104,14 +104,14 @@ var heatMapColor = d3.scaleSequential()
     .interpolator(d3.interpolateInferno)
     .domain([0, 1])
 
-day_summary_data = new Object();
+var day_summary_data = new Object();
 
 function sentiment_heatmap(selectedGroup) {
     var selectedGroup = selectedGroup.split("_").join(" ")
 
     var keywords_of_interest = Object.values(coin_map_to_name[selectedGroup.toLowerCase()])
 
-    var day_summary_data = new Object();
+    day_summary_data = new Object();
     var rearranged_data = new Object();
     var highest_val = 0;
     var lowest_val = 0;
@@ -132,21 +132,17 @@ function sentiment_heatmap(selectedGroup) {
         if(overall_score < lowest_val){
             lowest_val = overall_score
         }
-
-        day_summary_data[val.timestamp] = day_summary_data[val.timestamp] == null ? overall_score : (day_summary_data[val.timestamp] + overall_score);
+        day_summary_data[val.timestamp + ""] = day_summary_data[val.timestamp  + ""] == null ? overall_score : (day_summary_data[val.timestamp + ""] + overall_score);
     });
-
 
     heat_svg.selectAll(".sentiment_map")
         .transition()
         .duration(1000)
         .style("fill", function (d) {
-            console.log(rearranged_data[d.timestamp + ":" + d.subreddit])
             if (rearranged_data[d.timestamp + ":" + d.subreddit] != null) {
                 //return heatMapColor(rearranged_data[d.timestamp + ":" + d.subreddit] / highest_val);
                 return heatMapColor(Math.log(rearranged_data[d.timestamp + ":" + d.subreddit])/ Math.log(highest_val));
             } else {
-                console.log("Is this running ever?")
                 return heatMapColor(d.val)
             }
         });

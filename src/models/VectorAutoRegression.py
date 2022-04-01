@@ -10,7 +10,7 @@ logger = logging.getLogger("VAR")
 
 REGRESSION_DAYS_USED = 60
 NUM_OBS = 7
-validate_or_predict = "predict"
+validate_or_predict = "validate"
 
 def create_model(data):
     train = data[:-NUM_OBS]
@@ -205,7 +205,7 @@ if __name__ == "__main__":
 
 
                 else:
-                   
+                
                     # PREDICTING THE FUTURE
                     forecast_data = forecast_data + (actual_data[-1] - forecast_data[0])
                     forecast_up_interval = forecast_up_interval + (actual_data[-1] - forecast_up_interval[0])
@@ -246,9 +246,9 @@ if __name__ == "__main__":
                     plt.figure(coin_name)
                     actual_data[-30:].plot(y="open")
 
-                    forecast_up_interval.plot(y="up_forecast")
-                    forecast_data.plot(y="open_forecast", color="yellow")
-                    forecast_down_interval.plot(y="down_forecast")
+                    forecast_up_interval.plot(y="up_forecast", color="red")
+                    forecast_data.plot(y="open_forecast", color="blue")
+                    forecast_down_interval.plot(y="down_forecast", color="red")
                     plt.savefig("{}/src/models/forecasts/output_{}.jpg".format(project_dir, coin_name))
 
             except Exception as e:

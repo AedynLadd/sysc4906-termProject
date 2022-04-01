@@ -222,8 +222,10 @@ function update_graph(selectedGroup) {
     
     var sentiment_min = null;
     var sentiment_max = null;
-
+    console.log("runs?")
+    console.log(day_summary_data)
     Object.keys(day_summary_data).forEach(function(key){ 
+        console.log(key)
         if (new_x(key) <= 0) return;
         sentiment_max = sentiment_max == null ? day_summary_data[key] : (sentiment_max < day_summary_data[key] ? day_summary_data[key] : sentiment_max);
         sentiment_min = sentiment_min == null ? day_summary_data[key] : (sentiment_min > day_summary_data[key] ? day_summary_data[key] : sentiment_min);
