@@ -39,6 +39,9 @@ https://aedynladd.github.io/sysc4906-termProject/
 ### Project Final Report
 https://www.overleaf.com/3577894345mwxmjmxzjskx
 
+### Final Presentation 
+https://docs.google.com/presentation/d/16gKRliZqtwadpBltuRdMHWVnDxvsKGmFHstY9s-X3vM/edit?usp=sharing
+
 ### Project Folder Structure
 ├── LICENSE <br/>
 ├── Makefile           <- Makefile with commands like `make data` or `make train`  <br/>
