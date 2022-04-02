@@ -189,14 +189,15 @@ def vectorAutoRegression(regression_days = REGRESSION_DAYS_USED, observations_ma
                     
                     actual_compare_data = actual_data[-NUM_OBS:] 
                     
-                    residual_forecast_error = np.array(actual_compare_data) - np.array(forecast_data)
+                    residual_forecast_error = np.array(actual_compare_data) - np.array(forecast_data) / np.array(forecast_data)
                     forecast_bias = sum(residual_forecast_error) * 1/len(residual_forecast_error)
                     mean_absolute_error = np.mean(abs(residual_forecast_error))
 
                     forecast_metrics[str(coin_name).replace(" ", "_")] = {
                         "residual_forecast_error": residual_forecast_error.tolist(),
                         "forecast_bias": forecast_bias.tolist(),
-                        "mean_absolute_error": mean_absolute_error.tolist()
+                        "mean_absolute_error": mean_absolute_error.tolist(),
+                        "first_error": residual_forecast_error.tolist()[1]
                     }
 
 
@@ -266,7 +267,7 @@ def vectorAutoRegression(regression_days = REGRESSION_DAYS_USED, observations_ma
 def vectorAutoRegression_summary(metrics):
     logger.info("Summarizing our VAR Statistics")
     try:
-        metric_df = pd.DataFrame(metrics).transpose()[["forecast_bias", "mean_absolute_error"]]
+        metric_df = pd.DataFrame(metrics).transpose()[["forecast_bias", "mean_absolute_error", "first_error"]]
         
         mean = metric_df.mean()
         return 200, mean
@@ -293,22 +294,23 @@ if __name__ == "__main__":
             logger.info("Maximizing validation")
             validation_stats = pd.DataFrame(columns=["trial", "mean_MAE", "mean_forecast_bias"])
             #for days_used in range(12, 12):
-            #for regressed_days in range(5, 7, 1):   
-            try:
-                logger.info("Using {} regression days".format(135))
-                status, metrics = vectorAutoRegression(135, 5)
-                logger.info("VECTOR AUTO REGRESSION HAS COMPLETED - STATUS CODE - {}".format(status))
-                if(status == 200):
-                    status, mean = vectorAutoRegression_summary(metrics)
+            for regressed_days in range(30, 365, 3):   
+                try:
+                    logger.info("Using {} regression days".format(135))
+                    status, metrics = vectorAutoRegression(regressed_days, 7)
+                    logger.info("VECTOR AUTO REGRESSION HAS COMPLETED - STATUS CODE - {}".format(status))
                     if(status == 200):
-                        validation_stats = validation_stats.append({
-                            "trial": "{}-{}".format(135,7),
-                            "mean_forecast_bias": mean["forecast_bias"], 
-                            "mean_MAE": mean["mean_absolute_error"]
-                        }, ignore_index=True)
+                        status, mean = vectorAutoRegression_summary(metrics)
+                        if(status == 200):
+                            validation_stats = validation_stats.append({
+                                "trial": "{}-{}".format(regressed_days, 7),
+                                "mean_forecast_bias": mean["forecast_bias"], 
+                                "mean_MAE": mean["mean_absolute_error"],
+                                "first_forecast_error": metrics["first_error"]
+                            }, ignore_index=True)
 
-            except Exception as e:
-                logger.info("error computing {}".format(e))
+                except Exception as e:
+                    logger.info("error computing {}".format(e))
 
             validation_stats.to_json("{}/src/models/forecasts/optimization.json".format(project_dir), orient="index")
 

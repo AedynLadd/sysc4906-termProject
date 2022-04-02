@@ -9,46 +9,68 @@
   <link rel="stylesheet" href="dashboard/css/header.css">
   <link rel="stylesheet" href="dashboard/css/coin_info.css">
   <link rel="stylesheet" href="dashboard/css/overview_info.css">
+  <link rel="stylesheet" href="dashboard/css/modal_menu.css">
   <script src="https://d3js.org/d3.v6.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
 </head>
 
 <body>
-  <div id="dashboard_header" class="dashboard_header">
-    <div class="title_header courseCodeSYSC">SYSC</div>
-    <div class="title_header courseCode4906">4906</div>
-    <div class="title_header Maintitle"> - CRYPTOCURRENCY SENTIMENT ANALYSIS</div>
-  </div>
-  <!-- DISPLAY CONTAINER -->
-  <div id="main_body" class="grid-container">
-    <!-- LEFT COIN SELECTOR -->
-    <ul class="coin_select" id="coin_select">
-      <div class="coin_select_overview" onclick="update(null)"> Overview </div>
-      <input type="text" class="coinSearch" id="coinSearch" onkeyup="search_coin()" placeholder="Search.."
-        title=" Enter a coin you want to learn more about">
-    </ul>
-    <!-- OVERVIEW INFO (RIGHT - OPT) -->
-    <div class="overview_info" id="overview_info_container">
-      <div class="cyclic_coin_info" id="cyclic_coin_info"></div>
-      <div class="keyword_network_diagram" id="keyword_network_diagram"></div>
-      <div class="network_diagram_data" id="network_diagram_data">
-        <div class="additional_coin_info_box" id="additional_coin_info_box">
-          <div class="additional_coin_info_box_title" id="additional_coin_info_box_title"></div>
-          <div class="additional_coin_info_box_substats" id="additional_coin_info_box_substats"></div>
-          <div class="chartA" id="chartA"></div>
-        </div>
+  <div id="landing_page" class="landing_page" href="#" onclick="hideLandingPage()">
+    <div id="landing_page_message" class="landing_page_message_title">DISCLAIMER
+      <div id="landing_page_message" class="landing_page_body">
+        Thank you for viewing TheCryptOutliers Dashboard! <br>
+        This website was created for the intent of research and data analysis.
+        With that please note that this is not financial or investment advice, nor should you treat it as a substitute
+        for it.
+        Conduct your own reasearch and verify it before making any investment decisions.
+        The Crypto Market can be highly volatile and the past predictions cannot always control what the future has to
+        hold.
       </div>
     </div>
-    <!-- SPECIFIC COIN INFO (RIGHT - OPT)-->
-    <div class="coin_info" id="coin_info_container">
-      <div class="coin_chart_data" id="coin_chart_data"></div>
-      <div class="coin_sentiment_heatmap" id="coin_sentiment_heatmap"></div>
-      <div class="forecast_coin_chart" id="forecast_coin_chart">
+  </div>
+  <div class="main_animation_body" id="main_animation_body">
+    <div id="help_modal" class="help_modal"></div>
+    <div id="dashboard_header" class="dashboard_header">
+      <div class="title_header courseCodeSYSC">SYSC</div>
+      <div class="title_header courseCode4906">4906</div>
+      <div class="title_header Maintitle"> - CRYPTOCURRENCY SENTIMENT ANALYSIS</div>
+      <div id="help_button_open" class="help_button">
+        <a href="#" style="float:right" class="help_button"><i class="fa fa-question-circle"></i></a>
+      </div>
+    </div>
+    <!-- DISPLAY CONTAINER -->
+    <div id="main_body" class="grid-container">
+      <!-- LEFT COIN SELECTOR -->
+      <ul class="coin_select" id="coin_select">
+        <div class="coin_select_overview" onclick="update(null)"> Overview </div>
+        <input type="text" class="coinSearch" id="coinSearch" onkeyup="search_coin()" placeholder="Search.."
+          title=" Enter a coin you want to learn more about">
+      </ul>
+      <!-- OVERVIEW INFO (RIGHT - OPT) -->
+      <div class="overview_info" id="overview_info_container">
+        <div class="cyclic_coin_info" id="cyclic_coin_info"></div>
+        <div class="keyword_network_diagram" id="keyword_network_diagram"></div>
+        <div class="network_diagram_data" id="network_diagram_data">
+          <div class="additional_coin_info_box" id="additional_coin_info_box">
+            <div class="additional_coin_info_box_title" id="additional_coin_info_box_title"></div>
+            <div class="additional_coin_info_box_substats" id="additional_coin_info_box_substats"></div>
+            <div class="chartA" id="chartA"></div>
+          </div>
+        </div>
+      </div>
+      <!-- SPECIFIC COIN INFO (RIGHT - OPT)-->
+      <div class="coin_info" id="coin_info_container">
+        <div class="coin_chart_data" id="coin_chart_data"></div>
+        <div class="coin_sentiment_heatmap" id="coin_sentiment_heatmap"></div>
+        <div class="forecast_coin_chart" id="forecast_coin_chart">
 
+        </div>
       </div>
     </div>
   </div>
   </div>
 </body>
+<script type="text/javascript" src="dashboard/scripts/page_load.js"></script>
 <!--  DATA VARIABLES  -->
 <!--  Data variables need to be loaded in first, and then visualization scripts can be loaded to actually perform visualization tasks on them -->
 <script type="text/javascript" src="dashboard/data/historical_data.js"></script>
