@@ -256,6 +256,7 @@ def vectorAutoRegression(regression_days = REGRESSION_DAYS_USED, observations_ma
             try:
                 with open("{}/data/processed/7d_forecast.json".format(project_dir), "w") as json_file:
                         json.dump(coin_forecasting, json_file)
+                        
             except Exception as e:
                 logger.error("Unable to save the forecasted data")
                 print(e)
