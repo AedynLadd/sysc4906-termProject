@@ -86,8 +86,8 @@
 }
 
 .networkGraph-node{
-    fill: rgb(104, 104, 104);
-    stroke: rgba(82, 82, 82, 0.3);
+    fill: rgb(94, 94, 94);
+    stroke: rgba(0, 0, 0, 0.711);
     stroke-width: 3px;
     cursor: pointer;
 }
