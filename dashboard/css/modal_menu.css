@@ -27,11 +27,11 @@
     opacity: 1;   
 }
   
-.landing_page_message_title{
+.landing_page_message{
     position: absolute;
     left: 50%;
     top: 50%;
-    transform: translate(-50%, -100%);
+    transform: translate(-50%, -75%);
     text-align: center;
     font-size: 50px;
     font-weight: bolder;
@@ -41,6 +41,22 @@
     color: rgb(120, 120, 120);
     font-size: 25px;
     font-weight: 10px;
+}
+
+.button {
+    border: none;
+    color: rgb(87, 83, 83);
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    padding-top: 5px;
+    cursor: pointer;
+  }
+.button.button1 {
+    background-color: rgb(216, 215, 215);
 }
 
 /*****************************/

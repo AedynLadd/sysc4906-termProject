@@ -46,10 +46,11 @@ def format_sentiment_and_coin_data(coin_data, sentiment_data):
     # turn timestamp column into our new indexing
     merged_data.index = pd.DatetimeIndex(merged_data["timestamp"]).to_period("d")
     
-    merged_data['z_score']= stats.zscore(merged_data['sentiment'])
-    #merged_data = merged_data.loc[merged_data['z_score'].abs()<=3]
+    merged_data["sentiment_log"] = np.log10(abs(merged_data['sentiment']) + 0.00001)
+    merged_data['z_score']= stats.zscore(merged_data['sentiment_log'])
+    merged_data = merged_data.loc[merged_data['z_score'].abs()<=4]
     merged_data.drop(labels = "timestamp", axis = 1, inplace=True)
-    merged_data.drop(labels = ["high", "low", "close", "volume", "marketCap", "count", "z_score"], axis=1, inplace=True)
+    merged_data.drop(labels = ["high", "low", "close", "volume", "marketCap", "count", "z_score", "sentiment_log"], axis=1, inplace=True)
 
     # any still existing NAs can be dropped (but should have been backfilled several steps ago)
     merged_data.dropna()
@@ -127,7 +128,7 @@ if __name__ == "__main__":
                         plt.close('all')
 
                     lags, xcorr = compute_cross_correlation(df_difference["open"], df_difference["sentiment"])
-
+                    
                     x_correlation_stats[coin_name] = {
                         "lag": abs(float(lags)),
                         "xcorr": float(xcorr)

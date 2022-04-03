@@ -12,26 +12,11 @@
   <link rel="stylesheet" href="dashboard/css/modal_menu.css">
   <script src="https://d3js.org/d3.v6.js"></script>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-  <style>
-    .button {
-    border: none;
-    color: rgb(87, 83, 83);
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 16px;
-    margin: 4px 2px;
-    cursor: pointer;
-  }
-  .button1 {background-color: rgb(216, 215, 215);}
-  </style>
-
 </head>
 
 <body>
   <div id="landing_page" class="landing_page" >
-    <div id="landing_page_message" class="landing_page_message_title">DISCLAIMER
+    <div id="landing_page_message" class="landing_page_message">DISCLAIMER
       <div id="landing_page_message" class="landing_page_body">
         Thank you for viewing TheCryptOutliers Dashboard! <br>
         This website was created for the intent of research and data analysis.
@@ -40,9 +25,7 @@
         Conduct your own reasearch and verify it before making any investment decisions.
         The Crypto Market can be highly volatile and the past predictions cannot always control what the future has to
         hold.
-        <div id = "landing_page_button" class="landing_page_button_press" href="#" onclick="hideLandingPage()">
-          <br><button class="button button1">Click Here To Continue</button>
-      </div>
+        <br><button class="button button1" onclick="hideLandingPage()">Click Here To Continue</button>
       </div>
     </div>
   </div>
@@ -71,7 +54,20 @@
         <div class="network_diagram_data" id="network_diagram_data">
           <div class="additional_coin_info_box" id="additional_coin_info_box">
             <div class="additional_coin_info_box_title" id="additional_coin_info_box_title"></div>
-            <div class="additional_coin_info_box_substats" id="additional_coin_info_box_substats"></div>
+            <div class="additional_coin_info_box_substats" id="additional_coin_info_box_substats">
+              <div class="substat_cards" id="coin_betweeness">
+                <div class="substat_cards_title" id="coin_betweeness_title"></div> 
+                <div class="substat_cards_subtitle" id="coin_betweeness_subtitle"></div>
+              </div>
+              <div class="substat_cards" id="coin_degree">
+                <div class="substat_cards_title" id="coin_degree_title"></div>
+                <div class="substat_cards_subtitle" id="coin_degree_subtitle"></div> 
+              </div>
+              <div class="substat_cards" id="coin_norm_betweeness">
+                <div class="substat_cards_title" id="coin_norm_betweeness_title"></div>
+                <div class="substat_cards_subtitle" id="coin_norm_betweeness_subtitle"></div> 
+              </div>
+            </div>
             <div class="chartA" id="chartA"></div>
           </div>
         </div>
