@@ -23,7 +23,7 @@ function openHelpMenu(){
     console.log(help_menu_visual_info)
     settingsOpen = true
     displayMouseHoeverInformation()
-    document.body.style.background = 'black';
+    //document.body.style.background = 'black';
     
 }
 
