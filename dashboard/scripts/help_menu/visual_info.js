@@ -16,8 +16,8 @@ const help_menu_visual_info = {
         "description": "When selected on a specfic Coin the Data of the specific coin will show ______________#tbd"
     },
     "coin_chart_data":{
-        "name": "Coin Chart Data For Year",
-        "description": "The Coin Chart Data will show a 1 year past time line of the specified coin price opening day price on a line chart"
+        "name": "Coin Chart Data Per Year",
+        "description": "The Coin Chart Data will show a 1 year past time line of the specified coin price opening day price on a coloured line chart with price on the left. the white line will show the overall sentiment score with the scale on the right"
     },
     "coin_sentiment_heatmap":{
         "name": "Coin Sentiment Heatmap From Subreddits",
