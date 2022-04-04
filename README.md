@@ -55,5 +55,8 @@ https://www.overleaf.com/3577894345mwxmjmxzjskx
 ### Final Presentation 
 https://docs.google.com/presentation/d/16gKRliZqtwadpBltuRdMHWVnDxvsKGmFHstY9s-X3vM/edit?usp=sharing
 
-
-
+### Google drive with raw and cleaned data
+https://drive.google.com/drive/folders/1YZVwZCQSzT5-Di5J0OAEuDc61EGLHvOA
+<br>
+data was too large to upload to github so we uploaded to a google drive
+You can download the entire project folder from github and then replace the empty data folder with data folder on Google drive
