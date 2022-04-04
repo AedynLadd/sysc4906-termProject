@@ -32,11 +32,12 @@ The files found in src/data can be used for performing intial data analysis:
 
 ### Step 3 Forecasting with Vector Autoregression
 <br><br>
-<b>src/dashboard/ ... </b> TODO
+<b>src/models/VectorAutoRegression</b>  This script is used to run a vector AutoRegression of the sentiment and coin open cost data. This script can be run in one of two modes: When the validate_or_predict flag is set to "validate" the model will run against data that it has previously collected on the coin cost against all 100 coins and store graphs and results in the folder identified as forecasts.  If run in "predict" mode, the model will predict the next 7 outcomes past the end of the time series.
 
 ### Step 4 Data visualization with Dashboard
 <br><br>
-<b>src/models/ ... </b> TODO
+<b>index.html<b>
+<b>dashboard/data/compile.py</b>  To refresh dashboard variables with newly collected data, simply run the compile.py script, each step will return a 200 code if completeled succesfully, if all steps are completed succesfully then the dashboard will display new data on its refresh. The dashboard is also hosted online at the link below. It has only been tested for chrome, however d3 is the main engine used to power the dashboard and is cross compatible with multiple browsers.
 
 ## Reports and Other Items of Interest
 ### Project Proposal
