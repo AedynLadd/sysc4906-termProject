@@ -27,15 +27,15 @@ The files found in src/data can be used for performing intial data analysis:
 <b>src/visualization/btc_sentiment.py</b> this script compares the Bitcoin sentiment on Reddit to the actual Bitcoin prices on CoinMarketCap. More specifically it fetches and parses Reddit Bitcoin sentiment values for each day for the 'BTC' and 'bitcoin' keywords from <b>data/processed/reddit_summary.json</b>. Additionally it also fetches and parses the actual Bitcoin prices from <b>/data/raw/coin market cap/Bitcoin.json</b>. After the values have been fetched, they are plotted using matplotlib and all plots/figures are saved under <b>reports/figures</b>.
 
 ### Step 2 Correlation Analysis
-<br><br>
+
 <b>src/models/final_analysis.py and X-correlation.py</b> these scripts perform all the correlation analysis in order to determine if the coin prices from CoinMarketCap in <b>/data/raw/coin market cap</b> and the reddit sentiment values from <b>data/processed/reddit_summary.json</b> are correlated.
 
 ### Step 3 Forecasting with Vector Autoregression
-<br><br>
+<br>
 <b>src/models/VectorAutoRegression</b>  This script is used to run a vector AutoRegression of the sentiment and coin open cost data. This script can be run in one of two modes: When the validate_or_predict flag is set to "validate" the model will run against data that it has previously collected on the coin cost against all 100 coins and store graphs and results in the folder identified as forecasts.  If run in "predict" mode, the model will predict the next 7 outcomes past the end of the time series.
 
 ### Step 4 Data visualization with Dashboard
-<br><br>
+<br>
 <b>index.html<b>
 <b>dashboard/data/compile.py</b>  To refresh dashboard variables with newly collected data, simply run the compile.py script, each step will return a 200 code if completeled succesfully, if all steps are completed succesfully then the dashboard will display new data on its refresh. The dashboard is also hosted online at the link below. It has only been tested for chrome, however d3 is the main engine used to power the dashboard and is cross compatible with multiple browsers.
 
