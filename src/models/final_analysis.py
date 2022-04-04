@@ -13,64 +13,28 @@ from statsmodels.stats.stattools import durbin_watson
 import statsmodels.api as sm
 import statsmodels.tsa.stattools as ts
 
-# #CALCULATING LAG
-# # https://stackoverflow.com/questions/49372282/find-the-best-lag-from-the-numpy-correlate-output
-# data_1 = np.sin(np.linspace(0, 10, 100))
-# data_1 += np.random.uniform(size=data_1.shape)   # noise
-# data_2 = np.cos(np.linspace(0, 7, 70))
-# data_2 += np.random.uniform(size=data_2.shape)   # noise
-#
-# corr = np.correlate(data_1 - np.mean(data_1),
-#                     data_2 - np.mean(data_2),
-#                     mode='full')
-# plt.plot(corr)
-# plt.show()
-# lag = corr.argmax() - (len(data_1) - 1)
-# print("lag: ", lag)
-# plt.plot(data_1, 'r*')
-# plt.plot(data_2, 'b*')
-# plt.show()
-
-
-# # CORRELATION COEFFICIENT AND LINEAR REGRESSION WITH NUMPY POLYFIT FUNCTION
-# # https://stackoverflow.com/questions/6148207/linear-regression-with-matplotlib-numpy
-# x = [1,2,3,4]
-# y = [4,5,7,10]
-#
-# # correlation coefficient
-# correlation_coeff = np.corrcoef(y, x)
-# print('correlation_coeff ', correlation_coeff[0][1])
-#
-# # linear regression
-# coef = np.polyfit(x,y,1)
-# print('slope ', coef[0])
-# print('intercept ', coef[1])
-# poly1d_fn = np.poly1d(coef)
-# # poly1d_fn is now a function which takes in x and returns an estimate for y
-# plt.plot(x,y, 'yo', x, poly1d_fn(x)) #'--k'=black dashed line, 'yo' = yellow circle marker
-#
-# plt.show()
-
-
-# TESTING homoscedasticity
-# https://docs.scipy.org/doc/scipy/reference/generated/scipy.stats.bartlett.html
-
-
 """
-    TODO
+    final_analysis.py contains the final phase code for the correlation analysis between
+    coin prices and sentiment values. 
+    
+    Running the program will read the CoinMarketCap coin price data found in 
+    data/raw/coin market cap and Reddit sentiment values found under
+    data/processed/reddit_summary_all.json
+    
+    This data will then be converted to stationary data via taking the differences and
+    then a variety of methods will be used on that stationary data to quantify the
+    amount of correlation between coin prices and sentiment
 """
 
-logger = logging.getLogger('linear_regression')
+logger = logging.getLogger('final_analysis')
 project_dir = '../src/data/'
 
-sentiment_max_outlier_val = 100
-sentiment_min_outlier_val = -100
 force_lag_days_offset = 0
 
+# keep both of these as False to quickly go through
+# all 100 coins and get an overall summary at the end
 show_plots = False
 save_figure_pngs = False
-
-
 
 
 """
@@ -87,9 +51,10 @@ def population_covariance(x, y):
     return cov
 
 
-# TODO, break stuff up into more helper functions
-
-
+"""
+    Takes in some data and computes the differences of that data
+    and then returns the differences
+"""
 def compute_diffs(data):
     diffs_with_dates = {}
     just_diffs = []
@@ -116,8 +81,15 @@ def compute_diffs(data):
     return diffs_with_dates, just_diffs
 
 
-# https://www.youtube.com/watch?v=bP1fbXd_XSk
-# https://www.statology.org/dickey-fuller-test-python/
+
+"""
+    Uses ADF test to check whether data is stationary, if not
+    stationary it will continually differentiate the data until
+    is passes the ADF test and is stationary
+    
+    https://www.youtube.com/watch?v=bP1fbXd_XSk
+    https://www.statology.org/dickey-fuller-test-python/
+"""
 def make_data_stationary(data):
     diffs_taken = 0
 
@@ -155,10 +127,9 @@ def make_data_stationary(data):
 
 
 """
-    TODO
+    cointegration test taken from
+    https://stackoverflow.com/questions/11362943/efficient-cointegration-test-in-python
 """
-
-# https://stackoverflow.com/questions/11362943/efficient-cointegration-test-in-python
 def cointegration_test(y, x):
     # Step 1: regress on variable on the other
     ols_result = sm.OLS(y, x).fit()
@@ -167,6 +138,10 @@ def cointegration_test(y, x):
     #        the residual is unit root
     return ts.adfuller(ols_result.resid)
 
+"""
+    main function that performs the full analysis
+    on all 100 coins
+"""
 def perform_analysis():
     sum_of_pearson_corr_coeffs = 0
     sum_of_cross_corrs = 0
@@ -230,7 +205,7 @@ def perform_analysis():
                 sum_of_coin_diffs_taken += num_diffs
                 num_coin_diffs_taken += 1
 
-                # durbin watson test
+                # Durbin watson test
                 # https://www.geeksforgeeks.org/statsmodels-durbin_watson-in-python/
                 dw = durbin_watson(list(coin_differences.values()))
                 print("Durbin watson test", dw)
@@ -254,12 +229,7 @@ def perform_analysis():
                             # shift the date to account for lag
                             date = date - timedelta(days=force_lag_days_offset)
 
-                            # ignore sentiment outliers
-                            if day_data["keyword_based_sentiment"][symbol]['sentiment'] < sentiment_max_outlier_val and \
-                                    day_data["keyword_based_sentiment"][symbol][
-                                        'sentiment'] > sentiment_min_outlier_val:
-                                sentiment_values.update(
-                                    {date: day_data["keyword_based_sentiment"][symbol]['sentiment']})
+                            sentiment_values.update({date: day_data["keyword_based_sentiment"][symbol]['sentiment']})
 
                 print("sentiment data:")
                 print(sentiment_values)
@@ -280,9 +250,9 @@ def perform_analysis():
                     sum_of_sentiment_dw_vals += dw
                     num_sentiment_dw_vals += 1
 
-                    # =====================================================
-                    #  Step 3 check where the coin data and sentiment data share common dates
-                    # =====================================================
+                    # ================================================================================
+                    #  Step 3 check where the coin price diffs and sentiment diffs share common dates
+                    # ================================================================================
                     num_matches = 0
                     matching_coin_diffs = []
                     matching_sentiment_diffs = []
@@ -293,14 +263,44 @@ def perform_analysis():
                             matching_sentiment_diffs.append(sentiment_differences[date])
                     print(num_matches, ' data points with common dates were found')
 
+                    # also check for common dates for the non-differentiated prices and sentiment values
+                    matching_coin_prices = []
+                    matching_sentiment_values = []
+                    for date in coin_prices:
+                        if date in sentiment_values:
+                            matching_coin_prices.append(coin_prices[date])
+                            matching_sentiment_values.append(sentiment_values[date])
+
+                    # plot non-differentiated prices vs sentiment values
+                    # --------------------------------------------------------
                     # clear any previous plots
                     plt.clf()
 
-                    title = "Price diffs vs sentiment diffs " + coin_name
+                    title = coin_name + " Price vs Sentiment"
+                    plt.scatter(matching_sentiment_values, matching_coin_prices)
+                    plt.title(title)
+                    plt.xlabel('Reddit Sentiment Score')
+                    plt.ylabel('Coin Price ($)')
+
+                    # save figure under reports/figures
+                    if save_figure_pngs:
+                        plt.savefig('{}/reports/figures/phase3/{}/{}'.format(project_dir, coin_name, (title + '.png')))
+
+                    # show plot
+                    if show_plots:
+                        plt.show()
+
+                    # also plot price diffs vs sentiment diffs
+                    # -----------------------------------------------
+
+                    # clear any previous plots
+                    plt.clf()
+
+                    title = coin_name + " Price difference(s) vs Sentiment difference(s)"
                     plt.scatter(matching_sentiment_diffs, matching_coin_diffs)
                     plt.title(title)
-                    plt.xlabel('Reddit sentiment score diffs')
-                    plt.ylabel('Coin price diffs')
+                    plt.xlabel('Reddit Sentiment Score difference(s)')
+                    plt.ylabel('Coin Price difference(s) ($)')
 
                     # save figure under reports/figures
                     if save_figure_pngs:
@@ -364,7 +364,13 @@ def perform_analysis():
                         # clear any previous plots
                         plt.clf()
 
-                        title = 'linear regression for ' + coin_name
+                        title = coin_name + " Linear Regression of Price difference(s) vs Sentiment difference(s)"
+                        plt.scatter(matching_sentiment_diffs, matching_coin_diffs)
+                        plt.title(title)
+                        plt.xlabel('Reddit sentiment score difference(s)')
+                        plt.ylabel('Coin price difference(s)')
+
+
                         plt.plot(matching_sentiment_diffs, matching_coin_diffs, 'yo', matching_sentiment_diffs,
                                  poly1d_fn(matching_sentiment_diffs))  # 'yo' = yellow circle marker
 
@@ -382,13 +388,6 @@ def perform_analysis():
                         # ----------------------------------------------
 
                         # using original coin prices and sentiment values (not the differenced data)
-                        matching_coin_prices = []
-                        matching_sentiment_values= []
-                        for date in coin_prices:
-                            if date in sentiment_values:
-                                matching_coin_prices.append(coin_prices[date])
-                                matching_sentiment_values.append(sentiment_values[date])
-
                         result = ts.coint(matching_coin_prices, matching_sentiment_values)
 
                         p_val = result[1]
@@ -440,25 +439,24 @@ def perform_analysis():
     print(round(percent_of_coins_where_cointegration_is_present, 6), "% of coins have cointegration")
 
 """
-    TODO
+    main function just runs the perform_analysis function
 """
 if __name__ == '__main__':
     try:
 
         logger.info('Done')
 
+        project_dir = Path(__file__).resolve().parents[1]
+
+        log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
+        logging.basicConfig(level=logging.INFO, format=log_fmt,
+                            handlers=[
+                                logging.FileHandler('{}/logs/final_analysis.log'.format(project_dir), mode='w'),
+                                logging.StreamHandler()
+                            ])
+
+        logger.info('performing analysis')
+        perform_analysis()
+
     except Exception as e:
         logger.error('An Error Occured: {}'.format(e))
-
-    # TODO, put back in try catch
-    project_dir = Path(__file__).resolve().parents[2]
-
-    log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
-    logging.basicConfig(level=logging.INFO, format=log_fmt,
-                        handlers=[
-                            logging.FileHandler('{}/logs/final_analysis.log'.format(project_dir), mode='w'),
-                            logging.StreamHandler()
-                        ])
-
-    logger.info('performing analysis')
-    perform_analysis()
