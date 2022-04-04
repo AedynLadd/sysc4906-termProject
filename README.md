@@ -1,5 +1,5 @@
 # SYSC 4906 Term Project
-By gathering data from reddit we will be analyzing the sentiment of posts in communities that have strong interests in investment, cryptocurrency, and world politics. We will determine if there exists a link between these sentiments and the flucuation of cryptocurrencies, and if a link exists if it can be used to accurately predict future market behaviour as a consequence of social media based mass hysteria among these populations. The code we have compiled for the initial data munging phase can be found at the Github Repository linked below.  
+The goal of this project was to gather data from reddit and analyze the sentiment of posts in communities that have strong interests in investment, cryptocurrency, and world politics. All of which is done in order to determine if there exists a link between these sentiments and the flucuation of cryptocurrencies, and if a link exists if it can be used to accurately predicted future market behaviour as a consequence of social media based mass hysteria among these populations. The code we have compiled for the initial data munging phase, data analysis and dashboard can be found in the Github Repository linked below.  
 
 ![plot](./reports/figures/project_overview.png)
 
