@@ -3,9 +3,7 @@ The goal of this project was to gather data from reddit and analyze the sentimen
 
 ![plot](./reports/figures/project_overview.png)
 
-## Getting Started
-
-### Initial Data Munging and Analysis
+### Step 1 Initial Data Munging and Analysis
 The files found in src/data can be used for performing intial data analysis:
 <br>
 <b>src/data/config</b> contains a configuration file that can be used to define several functions:
@@ -28,9 +26,17 @@ The files found in src/data can be used for performing intial data analysis:
 <br><br>
 <b>src/visualization/btc_sentiment.py</b> this script compares the Bitcoin sentiment on Reddit to the actual Bitcoin prices on CoinMarketCap. More specifically it fetches and parses Reddit Bitcoin sentiment values for each day for the 'BTC' and 'bitcoin' keywords from <b>data/processed/reddit_summary.json</b>. Additionally it also fetches and parses the actual Bitcoin prices from <b>/data/raw/coin market cap/Bitcoin.json</b>. After the values have been fetched, they are plotted using matplotlib and all plots/figures are saved under <b>reports/figures</b>.
 
-### Correlation Analysis
+### Step 2 Correlation Analysis
 <br><br>
-<b>src/data/final_analysis.py and X-correlation.py</b> these scripts perform all the correlation analysis in order to determine if the coin prices from CoinMarketCap in <b>/data/raw/coin market cap</b> and the reddit sentiment values from <b>data/processed/reddit_summary.json</b> are correlated.
+<b>src/models/final_analysis.py and X-correlation.py</b> these scripts perform all the correlation analysis in order to determine if the coin prices from CoinMarketCap in <b>/data/raw/coin market cap</b> and the reddit sentiment values from <b>data/processed/reddit_summary.json</b> are correlated.
+
+### Step 3 Forecasting with Vector Autoregression
+<br><br>
+<b>src/dashboard/ ... </b> TODO
+
+### Step 4 Data visualization with Dashboard
+<br><br>
+<b>src/models/ ... </b> TODO
 
 ## Reports and Other Items of Interest
 ### Project Proposal
@@ -48,43 +54,5 @@ https://www.overleaf.com/3577894345mwxmjmxzjskx
 ### Final Presentation 
 https://docs.google.com/presentation/d/16gKRliZqtwadpBltuRdMHWVnDxvsKGmFHstY9s-X3vM/edit?usp=sharing
 
-### Project Folder Structure
-├── LICENSE <br/>
-├── Makefile           <- Makefile with commands like `make data` or `make train`  <br/>
-├── README.md          <- The top-level README for developers using this project. <br/>
-├── data  <br/>
-│   ├── external       <- Data from third party sources.  <br/>
-│   ├── interim        <- Intermediate data that has been transformed.  <br/>
-│   ├── processed      <- The final, canonical data sets for modeling.  <br/>
-│   └── raw            <- The original, immutable data dump.  <br/>
-│ <br/>
-├── docs               <- A default Sphinx project; see sphinx-doc.org for details <br/>
-│ <br/>
-├── models             <- Trained and serialized models, model predictions, or model summaries <br/>
-│ <br/>
-├── notebooks          <- Jupyter notebooks. Naming convention is a number (for ordering), <br/>
-│                         the creator's initials, and a short `-` delimited description, e.g. <br/>
-│                         `1.0-jqp-initial-data-exploration`. <br/>
-│ <br/>
-├── references         <- Data dictionaries, manuals, and all other explanatory materials. <br/>
-│ <br/>
-├── reports            <- Generated analysis as HTML, PDF, LaTeX, etc. <br/>
-│ <br/>
-├── requirements.txt   <- The requirements file for reproducing the analysis environment, e.g. <br/>
-│                         generated with `pip freeze > requirements.txt` <br/>
-│ <br/>
-├── setup.py           <- Make this project pip installable with `pip install -e` <br/>
-├── src                <- Source code for use in this project. <br/>
-│   ├── __init__.py    <- Makes src a Python module <br/>
-│   │ <br/>
-│   ├── data           <- Scripts to download or generate data <br/>
-|        └── Config    <- Config files for running scripts
-│   │ <br/>
-│   ├── features       <- Scripts to turn raw data into features for modeling <br/>
-│   │ <br/>
-│   ├── models         <- Scripts to train models and then use trained models to make <br/>
-│   │ <br/>
-│   └── visualization  <- Scripts to create exploratory and results oriented visualizations <br/>
-│ <br/>
-└── tox.ini            <- tox file with settings for running tox; see tox.readthedocs.io <br/>
+
 
