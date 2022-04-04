@@ -21,14 +21,14 @@ The files found in src/data can be used for performing intial data analysis:
 <b>src/data/summarize_data.py</b> this script creates a summary of all the afformentioned data grouped per day, displaying information such as the combined sentiment, number of posts, and sentiment as it relates to keywords.
 
 <br><br>
-<b>src/visualization/all_coin_sentiment.py</b> this script compares the overall coin sentiment on Reddit to the actual coin prices. More specifically it fetches and parses Reddit sentiment values for each day from <b>data/processed/reddit_summary.json</b> along with actual coin prices from json files in <b>/data/raw/coin market cap</b>. After the values have been fetched, they are plotted using matplotlib and all plots/figures are saved under <b>reports/figures</b>
+<b>src/visualization/all_coin_sentiment.py</b> this script is from phase 2 and compares the overall coin sentiment on Reddit to the actual coin prices. More specifically it fetches and parses Reddit sentiment values for each day from <b>data/processed/reddit_summary.json</b> along with actual coin prices from json files in <b>/data/raw/coin market cap</b>. After the values have been fetched, they are plotted using matplotlib and all plots/figures are saved under <b>reports/figures</b>
 
 <br><br>
-<b>src/visualization/btc_sentiment.py</b> this script compares the Bitcoin sentiment on Reddit to the actual Bitcoin prices on CoinMarketCap. More specifically it fetches and parses Reddit Bitcoin sentiment values for each day for the 'BTC' and 'bitcoin' keywords from <b>data/processed/reddit_summary.json</b>. Additionally it also fetches and parses the actual Bitcoin prices from <b>/data/raw/coin market cap/Bitcoin.json</b>. After the values have been fetched, they are plotted using matplotlib and all plots/figures are saved under <b>reports/figures</b>.
+<b>src/visualization/btc_sentiment.py</b> this script is from phase 2 and compares the Bitcoin sentiment on Reddit to the actual Bitcoin prices on CoinMarketCap. More specifically it fetches and parses Reddit Bitcoin sentiment values for each day for the 'BTC' and 'bitcoin' keywords from <b>data/processed/reddit_summary.json</b>. Additionally it also fetches and parses the actual Bitcoin prices from <b>/data/raw/coin market cap/Bitcoin.json</b>. After the values have been fetched, they are plotted using matplotlib and all plots/figures are saved under <b>reports/figures</b>.
 
 ### Step 2 Correlation Analysis
 
-<b>src/models/final_analysis.py and X-correlation.py</b> these scripts perform all the correlation analysis in order to determine if the coin prices from CoinMarketCap in <b>/data/raw/coin market cap</b> and the reddit sentiment values from <b>data/processed/reddit_summary.json</b> are correlated.
+<b>src/models/final_analysis.py and X-correlation.py</b> these scripts are from phase 3 and perform all the correlation analysis in order to determine if the coin prices from CoinMarketCap in <b>/data/raw/coin market cap</b> and the reddit sentiment values from <b>data/processed/reddit_summary.json</b> are correlated. More specifically they read data from <b>data/processed/reddit_summary.json</b> along with coin prices from json files in <b>/data/raw/coin market cap</b>, donvert that data to stationary data and then perform a vareity of correlation quantification methods.
 
 ### Step 3 Forecasting with Vector Autoregression
 <br>
