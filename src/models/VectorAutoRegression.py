@@ -11,13 +11,13 @@ logger = logging.getLogger("VAR")
 
 REGRESSION_DAYS_USED = 135
 NUM_OBS = 7
-validate_or_predict = "predict"
+validate_or_predict = "validate"
 
 def create_model(data):
     train = data[:-NUM_OBS]
     model = VAR(train)
 
-    results = model.fit(3)
+    results = model.fit(4)
     # logger.info(results.summary())
     return results
 
@@ -83,9 +83,7 @@ def format_sentiment_and_coin_data(coin_data, sentiment_data, bitcoin_sentiment)
     specific_sentiment = pd.merge(left = coin_specific_sentiment, right=bitcoin_specific_sentiment, how='left', left_on='timestamp', right_on='timestamp')
 
     merged_data = pd.merge(left=coin_data, right=specific_sentiment, how='left', left_on='timestamp', right_on='timestamp')
-    merged_data["sentiment"].fillna(method="bfill", inplace=True)
-    merged_data["btc_sentiment"].fillna(method="bfill", inplace=True)
-    merged_data["count"].fillna(method="bfill", inplace=True)
+    merged_data["sentiment"].fillna(method="ffill", inplace=True)
 
     merged_data.index = pd.DatetimeIndex(merged_data["timestamp"]).to_period("d")
     merged_data.drop(labels = "timestamp", axis = 1, inplace=True)
@@ -101,7 +99,6 @@ def vectorAutoRegression(regression_days = REGRESSION_DAYS_USED, observations_ma
     REGRESSION_DAYS_USED = regression_days
     NUM_OBS = observations_made
 
-    
     try:
         coin_mapping_file = open("{}/data/raw/coinmarketcap/top_100_coins.json".format(project_dir))
         coin_mapping = json.load(coin_mapping_file)["coins"]
@@ -189,15 +186,15 @@ def vectorAutoRegression(regression_days = REGRESSION_DAYS_USED, observations_ma
                     
                     actual_compare_data = actual_data[-NUM_OBS:] 
                     
-                    residual_forecast_error = np.array(actual_compare_data) - np.array(forecast_data) / np.array(forecast_data)
+                    residual_forecast_error = (np.array(actual_compare_data) - np.array(forecast_data))/ np.array(actual_compare_data)
+
                     forecast_bias = sum(residual_forecast_error) * 1/len(residual_forecast_error)
                     mean_absolute_error = np.mean(abs(residual_forecast_error))
 
                     forecast_metrics[str(coin_name).replace(" ", "_")] = {
                         "residual_forecast_error": residual_forecast_error.tolist(),
                         "forecast_bias": forecast_bias.tolist(),
-                        "mean_absolute_error": mean_absolute_error.tolist(),
-                        "first_error": residual_forecast_error.tolist()[1]
+                        "mean_absolute_error": mean_absolute_error.tolist()
                     }
 
 
@@ -239,7 +236,8 @@ def vectorAutoRegression(regression_days = REGRESSION_DAYS_USED, observations_ma
                     }
                     
                         
-                if coin_name == "Bitcoin":
+                if coin_name == "Bitcoin" or coin_name == "Polygon" or coin_name == "Ethereum":
+
                     plt.figure("output_{}-{}_{}".format(coin_name, REGRESSION_DAYS_USED, NUM_OBS))
                     actual_data[-30:].plot(y="open")
 
@@ -247,10 +245,13 @@ def vectorAutoRegression(regression_days = REGRESSION_DAYS_USED, observations_ma
                     forecast_data.plot(y="open_forecast", color="blue")
                     forecast_down_interval.plot(y="down_forecast", color="red")
                     plt.savefig("{}/src/models/forecasts/graphs/output_{}-{}_{}.jpg".format(project_dir, coin_name, REGRESSION_DAYS_USED, NUM_OBS))
+                    plt.close()
 
             except Exception as e:
                 logger.error("An error has occured {}".format(e))
 
+        plt.savefig("{}/src/models/x-correlation/output_regression-{}.jpg".format(project_dir, coin_name))
+        plt.close('all')
         if validate_or_predict == "predict":
             # save the forecasting data for display 
             try:
@@ -268,8 +269,8 @@ def vectorAutoRegression(regression_days = REGRESSION_DAYS_USED, observations_ma
 def vectorAutoRegression_summary(metrics):
     logger.info("Summarizing our VAR Statistics")
     try:
-        metric_df = pd.DataFrame(metrics).transpose()[["forecast_bias", "mean_absolute_error", "first_error"]]
-        
+        metric_df = pd.DataFrame(metrics).transpose()[["forecast_bias", "mean_absolute_error"]]
+        print(metric_df.head(5))
         mean = metric_df.mean()
         return 200, mean
     except Exception as e:
@@ -295,23 +296,22 @@ if __name__ == "__main__":
             logger.info("Maximizing validation")
             validation_stats = pd.DataFrame(columns=["trial", "mean_MAE", "mean_forecast_bias"])
             #for days_used in range(12, 12):
-            for regressed_days in range(30, 365, 3):   
-                try:
-                    logger.info("Using {} regression days".format(135))
-                    status, metrics = vectorAutoRegression(regressed_days, 7)
-                    logger.info("VECTOR AUTO REGRESSION HAS COMPLETED - STATUS CODE - {}".format(status))
+            #for regressed_days in range(30, 365, 1):   
+            try:
+                logger.info("Using {} regression days".format(135))
+                status, metrics = vectorAutoRegression()
+                logger.info("VECTOR AUTO REGRESSION HAS COMPLETED - STATUS CODE - {}".format(status))
+                if(status == 200):
+                    status, mean = vectorAutoRegression_summary(metrics)
                     if(status == 200):
-                        status, mean = vectorAutoRegression_summary(metrics)
-                        if(status == 200):
-                            validation_stats = validation_stats.append({
-                                "trial": "{}-{}".format(regressed_days, 7),
-                                "mean_forecast_bias": mean["forecast_bias"], 
-                                "mean_MAE": mean["mean_absolute_error"],
-                                "first_forecast_error": metrics["first_error"]
-                            }, ignore_index=True)
+                        validation_stats = validation_stats.append({
+                            "trial": "{}-{}".format(135, 7),
+                            "mean_forecast_bias": mean["forecast_bias"], 
+                            "mean_MAE": mean["mean_absolute_error"]
+                        }, ignore_index=True)
 
-                except Exception as e:
-                    logger.info("error computing {}".format(e))
+            except Exception as e:
+                logger.info("error computing {}".format(e))
 
             validation_stats.to_json("{}/src/models/forecasts/optimization.json".format(project_dir), orient="index")
 

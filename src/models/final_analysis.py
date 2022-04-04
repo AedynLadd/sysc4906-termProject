@@ -7,6 +7,7 @@ from datetime import datetime
 from datetime import timedelta
 from pathlib import Path
 import os
+import sys
 from statsmodels.tsa.stattools import adfuller
 from statsmodels.stats.stattools import durbin_watson
 import statsmodels.api as sm
@@ -137,6 +138,7 @@ def make_data_stationary(data):
         if p_val >= 0.05:
             while p_val >= 0.05:
                 diff_with_dates, just_diffs = compute_diffs(diff_with_dates)
+                print(just_diffs)
                 diffs_taken += 1
                 adf = adfuller(just_diffs)
                 p_val = adf[1]
@@ -328,6 +330,11 @@ def perform_analysis():
                         # covariance
                         # ----------------------------------------------
                         cov = population_covariance(matching_coin_diffs, matching_sentiment_diffs)
+                        if(filename == "Bitcoin.json"):
+                            print(matching_coin_diffs)
+                            print(filename)
+                            sys.exit()
+                        
                         print('covariance:', cov)
                         sum_of_covariances += cov
 
@@ -444,7 +451,7 @@ if __name__ == '__main__':
         logger.error('An Error Occured: {}'.format(e))
 
     # TODO, put back in try catch
-    project_dir = Path(__file__).resolve().parents[1]
+    project_dir = Path(__file__).resolve().parents[2]
 
     log_fmt = '%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     logging.basicConfig(level=logging.INFO, format=log_fmt,

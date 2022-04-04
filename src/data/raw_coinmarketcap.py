@@ -43,17 +43,16 @@ def get_historical_data(coin_id, currencyId, numDays):
         coin_id = bitcoin id as per coinmarketcap.com 
         convertId = Currency id to use
     """
-    url = "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/historical"
-
+    print(int(time.time()))
+    url = "https://api.coinmarketcap.com/data-api/v3/cryptocurrency/historical?id={}&convertId=2784&timeStart=1613665956&timeEnd=1648361265".format(coin_id) 
     params = {
         "id": coin_id,
         "convertId": currencyId,
-        "timeStart": int(abs(time.time() - (86400*numDays))), # seconds since epoch (UNIX time)
+        "timeStart": 1613665956, # seconds since epoch (UNIX time)
         "timeEnd": int(time.time())
     }
     
-    response = requests.get(url, params)
-    
+    response = requests.get(url)
     # Sleep a tiny bit between requests just to make sure we aren't overwellming coinmarketplace
     time.sleep(1)
 
