@@ -28,6 +28,10 @@ The files found in src/data can be used for performing intial data analysis:
 <br><br>
 <b>src/visualization/btc_sentiment.py</b> this script compares the Bitcoin sentiment on Reddit to the actual Bitcoin prices on CoinMarketCap. More specifically it fetches and parses Reddit Bitcoin sentiment values for each day for the 'BTC' and 'bitcoin' keywords from <b>data/processed/reddit_summary.json</b>. Additionally it also fetches and parses the actual Bitcoin prices from <b>/data/raw/coin market cap/Bitcoin.json</b>. After the values have been fetched, they are plotted using matplotlib and all plots/figures are saved under <b>reports/figures</b>.
 
+### Correlation Analysis
+<br><br>
+<b>src/data/final_analysis.py and X-correlation.py</b> these scripts perform all the correlation analysis in order to determine if the coin prices from CoinMarketCap in <b>/data/raw/coin market cap</b> and the reddit sentiment values from <b>data/processed/reddit_summary.json</b> are correlated.
+
 ## Reports and Other Items of Interest
 ### Project Proposal
 https://www.overleaf.com/8239623562pxkkmdjdtbsg
